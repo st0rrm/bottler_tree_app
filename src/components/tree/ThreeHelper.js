@@ -6,8 +6,11 @@ export const Utils = {
   ratioScale: 0.015 / 1,
   screenWidth: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
   screenHeight: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,
+  getRatio() {
+    return this.ratioScale * (this.screenHeight / this.standardHeight);
+  },
   getSize(width, height) {
-    const ratio = this.ratioScale * (this.screenHeight / this.standardHeight);
+    const ratio = this.getRatio();
     return {
       width: width * ratio,
       height: height * ratio,

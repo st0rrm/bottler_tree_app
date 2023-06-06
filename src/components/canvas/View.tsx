@@ -1,7 +1,7 @@
 'use client'
 
 import { forwardRef, Suspense, useImperativeHandle, useRef } from 'react'
-import { OrbitControls, PerspectiveCamera, View as ViewImpl } from '@react-three/drei'
+import { Environment, OrbitControls, PerspectiveCamera, View as ViewImpl } from '@react-three/drei'
 import { Three } from '@/helpers/components/Three'
 import Stats from 'three/examples/jsm/libs/stats.module'
 import { useFrame } from '@react-three/fiber'
