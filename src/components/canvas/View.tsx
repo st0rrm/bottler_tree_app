@@ -3,15 +3,9 @@
 import { forwardRef, Suspense, useImperativeHandle, useRef } from 'react'
 import { Environment, OrbitControls, PerspectiveCamera, View as ViewImpl } from '@react-three/drei'
 import { Three } from '@/helpers/components/Three'
-import Stats from 'three/examples/jsm/libs/stats.module'
 import { useFrame } from '@react-three/fiber'
-
+import { Perf } from "r3f-perf"
 export const Common = ({ color }) => {
-  const stats = new Stats()
-  document.body.appendChild(stats.dom)
-  useFrame((_, delta) => {
-    stats.update()
-  })
   return (
     <Suspense fallback={null}>
       {color && <color attach='background' args={[color]} />}
@@ -23,7 +17,7 @@ export const Common = ({ color }) => {
   )
 }
 
-const View = forwardRef(({ children, orbit, ...props }, ref) => {
+const View = forwardRef(({ children, orbit, debug=false, ...props }, ref) => {
   const localRef = useRef(null)
   useImperativeHandle(ref, () => localRef.current)
 
@@ -31,6 +25,7 @@ const View = forwardRef(({ children, orbit, ...props }, ref) => {
     <>
       <div ref={localRef} {...props} />
       <Three>
+        {debug && <Perf position="top-left" />}
         <ViewImpl track={localRef}>
           {children}
           {orbit && <OrbitControls />}

@@ -1,9 +1,8 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { Test } from '@/components/tree/Test'
-import { Box } from '@react-three/drei'
-
+import LSystemInstanced from '@/components/tree/LSystemInstanced'
+import { useRef, useState } from 'react'
 
 const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.View), {
   ssr: false,
@@ -23,12 +22,23 @@ const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.
 const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mod.Common), { ssr: false })
 
 export default function Page() {
+  const treeRef = useRef()
+  const [count, setCount] = useState(0)
 
+  const handleGrow = () => {
+    const next = count + 1
+    const total = next * 50
+    treeRef.current.generating(total, next)
+    setCount(next)
+  }
   return (
     <>
-      <View className='absolute top-0 flex h-screen w-full flex-col items-center justify-center' orbit>
+      <div className={"fixed w-32 h-16 top-0 right-0 bg-amber-300 z-40"}>
+        <button onClick={handleGrow} className={"w-full h-full"}>GROW</button>
+      </div>
+      <View debug className='absolute top-0 flex h-screen w-full flex-col items-center justify-center' orbit>
         {/*<Box args={[1, 1, 1]} position={[0, 0, 0]} />*/}
-        <Test/>
+        <LSystemInstanced ref={treeRef} />
         <Common color={"darkgray"} />
       </View>
     </>
