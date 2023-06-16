@@ -3,7 +3,7 @@ const gen = require("random-seed");
 
 export const Utils = {
   standardHeight: 1334,
-  ratioScale: 0.015 / 1,
+  ratioScale: 0.01,
   screenWidth: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
   screenHeight: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,
   getRatio() {
@@ -19,12 +19,11 @@ export const Utils = {
   seed: 0,
   rand: new gen(new Date().getTime()),
   getPos(x) {
-    const ratio = this.ratioScale * (this.screenHeight / this.standardHeight);
-    return x * ratio;
+    return x * this.getRatio();
   },
   randomRange(min, max) {
     this.rand.seed(new Date().getTime());
-    return this.rand.floatBetween(min, max);
+    return this.rand.floatBetween(min, max)
   },
   randomRangeInt(min, max) {
     this.rand.seed(new Date().getTime());

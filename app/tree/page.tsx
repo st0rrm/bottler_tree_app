@@ -2,7 +2,9 @@
 
 import dynamic from 'next/dynamic'
 import LSystemInstanced from '@/components/tree/LSystemInstanced'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { Utils } from '@/components/tree/ThreeHelper'
+import { Box } from '@react-three/drei'
 
 const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.View), {
   ssr: false,
@@ -28,9 +30,16 @@ export default function Page() {
   const handleGrow = () => {
     const next = count + 1
     const total = next * 50
-    treeRef.current.generating(total, next)
+    treeRef.current.generating(total, next, 2)
     setCount(next)
   }
+
+  useEffect(()=>{
+    const sw = Utils.screenWidth
+    const sh = Utils.screenHeight
+    console.log("sw: ", sw, "sh: ", sh, " ratio: ", Utils.getRatio())
+  }, [])
+
   return (
     <>
       <div className={"fixed w-32 h-16 top-0 right-0 bg-amber-300 z-40"}>
@@ -38,7 +47,20 @@ export default function Page() {
       </div>
       <View debug className='absolute top-0 flex h-screen w-full flex-col items-center justify-center' orbit>
         {/*<Box args={[1, 1, 1]} position={[0, 0, 0]} />*/}
-        <LSystemInstanced ref={treeRef} />
+        <group position={[0, -3, 0]}>
+          <LSystemInstanced ref={treeRef} />
+
+        </group>
+        <group position={[0, -2, 0]}>
+          <Box scale={[0.1, 0.1, 0.1]} >
+            <meshStandardMaterial color={"red"}  />
+          </Box>
+        </group>
+
+        <Box scale={[0.1, 0.1, 0.1]} >
+          <meshStandardMaterial color={"yellow"}  />
+        </Box>
+
         <Common color={"darkgray"} />
       </View>
     </>

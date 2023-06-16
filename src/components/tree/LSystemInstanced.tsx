@@ -1,10 +1,9 @@
-
-
 import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import { Utils } from '@/components/tree/ThreeHelper'
 import { Euler, MathUtils, Object3D, Quaternion, Vector3 } from 'three'
 import TreeInstancesPool from '@/components/tree/TreeInstancesPool'
 import { branchImages, flowerImages, fruitImages, leafImages } from '@/components/tree/resources'
+
 
 type meta = {
   type: string | null
@@ -31,6 +30,33 @@ const randomArea = (count) => {
   return random
 }
 
+//
+//variables
+//
+let count = 0
+let transform = new Object3D()
+let initPositions = []
+let savedTransforms = []
+let totalPoint = 0
+let totalCount = 0
+let currentPath = ""
+let delay = 0
+let selectedBlossoms = -1
+let width = Utils.getPos(1)
+let minPetalLength = Utils.getPos(0.3)
+let maxPetalLength = Utils.getPos(0.5)
+let minBranchLength = Utils.getPos(0.5)
+let maxBranchLength = Utils.getPos(1)
+
+console.log("%c ---- LSYSTEM INSTANCED ----", "color:red")
+
+/* File : LSystem.cs
+ * Author : Derek Nguyen
+ * Description: Creates a procedurally generated tree using LSystem
+ *              https://en.wikipedia.org/wiki/L-system
+ *              F : Forward, X : Control Curve, + : turn right, - : turn left, [ : push stack, ] : pop stack
+ *
+ */
 const LSystemInstanced = forwardRef( (props, ref) => {
   //
   //constants
@@ -45,7 +71,7 @@ const LSystemInstanced = forwardRef( (props, ref) => {
   const resetCount = 3 // 홀수만 설정 가능
   const delayTime = 0.1
   const lengthScale = 0.5
-  const widthScale = 0.95
+  const widthScale = 0.7
   const randomRotations = randomArea(1000)
   const conditionPoints = [30, 50, 70, 90, 100, 120, 140, 160, 180, 200, 220]
   const variance = 25
@@ -54,32 +80,19 @@ const LSystemInstanced = forwardRef( (props, ref) => {
   const leafRef = useRef()
   const flowerRef = useRef()
   const fruitRef = useRef()
-  //
-  //variables
-  //
-  let totalPoint = 0
-  let totalCount = 0
-  let currentPath = createPath(axiom, rules, iterations)
-  let count = 0
-  let delay = 0
-  let selectedBlossoms = -1
-  let transform = new Object3D()
-  let initPositions = []
-  let savedTransforms = []
-  let width = Utils.getPos(1)
-  let minPetalLength = Utils.getPos(5)
-  let maxPetalLength = Utils.getPos(10)
-  let minBranchLength = Utils.getPos(3)
-  let maxBranchLength = Utils.getPos(5)
+
   //
   //hooks
   //
-  useEffect(() => {}, [])
+  useEffect(() => {
+    console.log("count: ", count)
+  }, [])
   useImperativeHandle(ref, () => ({
     generating: (total, count, generate = 2) => {
       totalPoint = total
       totalCount = count
       for (let i = 0; i < generate; i++) {
+        currentPath = createPath(axiom, rules, iterations)
         build()
       }
     }
@@ -116,6 +129,9 @@ const LSystemInstanced = forwardRef( (props, ref) => {
     delay = 0
     getCurrentCount()
     setConditionPoint()
+
+    console.log("count: ", count)
+    console.log("currentPath: ", currentPath)
 
     for (let i = 0; i < currentPath.length; i++) {
       switch (currentPath[i]) {
@@ -154,7 +170,8 @@ const LSystemInstanced = forwardRef( (props, ref) => {
 
   const buildForward = (i) => {
     let order_pz = 0
-    let branchLength = Utils.randomRange(-maxBranchLength, 0)
+
+    let branchLength = Utils.randomRange(minBranchLength, maxBranchLength) // changed from negative value
 
     //sets current object as branch or blossom
     let currentObject = {} as meta
@@ -179,7 +196,7 @@ const LSystemInstanced = forwardRef( (props, ref) => {
       currentObject.type = 'leaf'
       currentObject.index = Utils.randomRangeInt(0, leafImages.length - 1)
     } else {
-      currentObject.type = 'branche'
+      currentObject.type = 'branch'
       currentObject.index = Utils.randomRangeInt(0, branchImages.length - 1)
     }
     //
@@ -187,8 +204,8 @@ const LSystemInstanced = forwardRef( (props, ref) => {
     //
     let length
     if (currentObject.type === 'blossoms') {
-      // blossom
-      length = Utils.randomRange(minPetalLength, maxPetalLength) * 0.1
+      // 🌸🌸🌸 blossom 🌸🌸🌸
+      length = Utils.randomRange(minPetalLength, maxPetalLength)
       const scale = new Vector3(length, length, length)
       //
       const pos = new Vector3(
@@ -201,8 +218,8 @@ const LSystemInstanced = forwardRef( (props, ref) => {
       // 🎈
       if(flowerRef.current) flowerRef.current.setNextMesh(pos, quat, scale, delay)
     } else if (currentObject.type === 'leaf') {
-      // leaves
-      length = Utils.randomRange(minPetalLength, maxPetalLength) * 0.1
+      // 🍃🍃🍃 leaves 🍃🍃🍃
+      length = Utils.randomRange(minPetalLength, maxPetalLength)
       const scale = new Vector3(length, length, length)
       //
       const pos = new Vector3(
@@ -214,8 +231,10 @@ const LSystemInstanced = forwardRef( (props, ref) => {
       quat.setFromEuler(new Euler(0, 0, MathUtils.degToRad(Utils.randomRange(0, 360)), 'XYZ'))
       leafRef.current.setNextMesh(pos, quat, scale, delay)
     } else {
-      // branch
+      // 🌴🌴🌴 branch 🌴🌴🌴
       length = Utils.randomRange(minBranchLength, maxBranchLength)
+
+      console.log("width: ", width, ", length: ", length)
 
       const scale = new Vector3(width, length, width)
       const pos = new Vector3(transform.position.x, transform.position.y, transform.position.z)
@@ -223,9 +242,11 @@ const LSystemInstanced = forwardRef( (props, ref) => {
       quat.setFromEuler(new Euler(transform.rotation.x, transform.rotation.y, transform.rotation.z, 'XYZ'))
       branchRef.current.setNextMesh(pos, quat, scale, delay)
       //
-      transform.translateY(length * Utils.getPos(200))
+      transform.translateY(length * 100)
       if (count < setInitPositionNum) initPositions.push(transform.position.clone())
     }
+
+    // console.log("%ctransform.position: %o", "color:red", transform.position)
 
     delay += delayTime
   }
@@ -236,8 +257,11 @@ const LSystemInstanced = forwardRef( (props, ref) => {
   const buildMove = () => {
     const g = Utils.randomRangeInt(0, initPositions.length - 1)
     const pos = initPositions[g]
+    console.log("pos: %o", pos)
     transform.position.set(pos.x, pos.y, pos.z)
     transform.rotation.set(0, 0, 0)
+    transform.updateMatrix()
+    // console.log("%cbuildMove::transform.position: %o", "color:green", transform.position)
   }
 
   const buildSave = () => {
@@ -255,8 +279,9 @@ const LSystemInstanced = forwardRef( (props, ref) => {
     width /= widthScale
     minBranchLength /= lengthScale
     maxBranchLength /= lengthScale
-    transform.position.set(saved.position.x, saved.position.y, saved.position.z)
-    transform.quaternion.set(saved.quaternion.x, saved.quaternion.y, saved.quaternion.z, saved.quaternion.w)
+    transform.position.copy(saved.position)
+    transform.quaternion.copy(saved.quaternion)
+    transform.updateMatrix()
   }
 
   return (
