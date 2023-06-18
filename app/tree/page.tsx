@@ -29,8 +29,8 @@ export default function Page() {
 
   const handleGrow = () => {
     const next = count + 1
-    const total = next * 50
-    treeRef.current.generating(total, next, 2)
+    const total = next * 10
+    treeRef.current.generating(total, next, 1)
     setCount(next)
   }
 
@@ -47,11 +47,10 @@ export default function Page() {
       </div>
       <View debug className='absolute top-0 flex h-screen w-full flex-col items-center justify-center' orbit>
         {/*<Box args={[1, 1, 1]} position={[0, 0, 0]} />*/}
-        <group position={[0, -3, 0]}>
+        <group position={[0, -15, 0]}>
           <LSystemInstanced ref={treeRef} />
-
         </group>
-        <group position={[0, -2, 0]}>
+        <group position={[0, -15, 0]}>
           <Box scale={[0.1, 0.1, 0.1]} >
             <meshStandardMaterial color={"red"}  />
           </Box>

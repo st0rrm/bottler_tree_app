@@ -23,6 +23,8 @@ const TreeInstancedMesh = ({ geometry, material, count, height }) => {
   const pool = useRef([]);
   const tween = useRef([]);
 
+
+
   useFrame((_, delta) => {
     for (let i = 0; i < tween.current.length; i++) {
       const target = tween.current[i];

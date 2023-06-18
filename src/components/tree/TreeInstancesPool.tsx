@@ -17,6 +17,7 @@ const TreeInstancesPool = forwardRef((props, ref) => {
         path={data.path}
         width={data.width}
         height={data.height}
+        type={data.type}
         key={nanoid()}
       />
     ))

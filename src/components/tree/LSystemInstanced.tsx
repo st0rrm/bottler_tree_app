@@ -4,7 +4,6 @@ import { Euler, MathUtils, Object3D, Quaternion, Vector3 } from 'three'
 import TreeInstancesPool from '@/components/tree/TreeInstancesPool'
 import { branchImages, flowerImages, fruitImages, leafImages } from '@/components/tree/resources'
 
-
 type meta = {
   type: string | null
   index: number | null
@@ -39,16 +38,15 @@ let initPositions = []
 let savedTransforms = []
 let totalPoint = 0
 let totalCount = 0
-let currentPath = ""
+let currentPath = ''
 let delay = 0
-let selectedBlossoms = -1
 let width = Utils.getPos(1)
 let minPetalLength = Utils.getPos(0.3)
-let maxPetalLength = Utils.getPos(0.5)
+let maxPetalLength = Utils.getPos(1)
 let minBranchLength = Utils.getPos(0.5)
-let maxBranchLength = Utils.getPos(1)
+let maxBranchLength = Utils.getPos(1.5)
 
-console.log("%c ---- LSYSTEM INSTANCED ----", "color:red")
+console.log('%c ---- LSYSTEM INSTANCED ----', 'color:red')
 
 /* File : LSystem.cs
  * Author : Derek Nguyen
@@ -57,7 +55,7 @@ console.log("%c ---- LSYSTEM INSTANCED ----", "color:red")
  *              F : Forward, X : Control Curve, + : turn right, - : turn left, [ : push stack, ] : pop stack
  *
  */
-const LSystemInstanced = forwardRef( (props, ref) => {
+const LSystemInstanced = forwardRef((props, ref) => {
   //
   //constants
   //
@@ -70,12 +68,12 @@ const LSystemInstanced = forwardRef( (props, ref) => {
   const angle = 15
   const resetCount = 3 // 홀수만 설정 가능
   const delayTime = 0.1
-  const lengthScale = 0.5
-  const widthScale = 0.7
+  const lengthScale = 0.75
+  const widthScale = 0.5
   const randomRotations = randomArea(1000)
-  const conditionPoints = [30, 50, 70, 90, 100, 120, 140, 160, 180, 200, 220]
+  const conditionPoints = [0, 30, 50, 70, 90, 100, 120, 140, 160, 180, 200, 220]
   const variance = 25
-  const setInitPositionNum = 11
+  const setInitPositionNum = 5
   const branchRef = useRef()
   const leafRef = useRef()
   const flowerRef = useRef()
@@ -85,7 +83,7 @@ const LSystemInstanced = forwardRef( (props, ref) => {
   //hooks
   //
   useEffect(() => {
-    console.log("count: ", count)
+    console.log('count: ', count)
   }, [])
   useImperativeHandle(ref, () => ({
     generating: (total, count, generate = 2) => {
@@ -95,7 +93,7 @@ const LSystemInstanced = forwardRef( (props, ref) => {
         currentPath = createPath(axiom, rules, iterations)
         build()
       }
-    }
+    },
   }))
   //
   //functions
@@ -115,23 +113,16 @@ const LSystemInstanced = forwardRef( (props, ref) => {
     }
     count++
   }
-  const setConditionPoint = () => {
-    for (let i = 0; i < conditionPoints.length; i++) {
-      if (totalPoint <= conditionPoints[i]) {
-        selectedBlossoms = i
-        return
-      }
-      selectedBlossoms = conditionPoints.length
-    }
-  }
+
 
   const build = () => {
     delay = 0
     getCurrentCount()
-    setConditionPoint()
 
-    console.log("count: ", count)
-    console.log("currentPath: ", currentPath)
+
+    // console.log('count: ', count)
+    // console.log('currentPath: ', currentPath)
+    console.log("%ctotalPoint: %s", "color:yellow;background-color: black;", totalPoint)
 
     for (let i = 0; i < currentPath.length; i++) {
       switch (currentPath[i]) {
@@ -168,7 +159,44 @@ const LSystemInstanced = forwardRef( (props, ref) => {
     }
   }
 
-  const buildForward = (i) => {
+  const checkPointLocation = (point, points) => {
+    const length = points.length;
+    const oneThirdValue = points[Math.floor(length / 3)];
+    const twoThirdsValue = points[Math.floor(length * 2 / 3)];
+
+    if (point < oneThirdValue || point < points[0]) {
+      return "leaf";
+    } else if (point >= oneThirdValue && point < twoThirdsValue) {
+      return "flower";
+    } else {
+      return "fruit";
+    }
+  }
+
+  const getTypeAndIndex = (type, images) => {
+    return {
+      type,
+      index: Utils.randomRangeInt(0, images.length - 1)
+    }
+  }
+
+  const getLeafAndIndex = () => {
+    const types = ["leaf", "flower", "fruit"];
+    const images = { leaf: leafImages, flower: flowerImages, fruit: fruitImages };
+
+    const locationType = checkPointLocation(totalPoint, conditionPoints);
+    const randomInt = Utils.randomRangeInt(0, types.length);
+
+    if (locationType === "leaf" || types[randomInt] === "leaf") {
+      return getTypeAndIndex('leaf', images.leaf);
+    } else if (locationType === "flower" || types[randomInt] === "flower") {
+      return getTypeAndIndex('flower', images.flower);
+    } else {
+      return getTypeAndIndex('fruit', images.fruit);
+    }
+  }
+
+    const buildForward = (i) => {
     let order_pz = 0
 
     let branchLength = Utils.randomRange(minBranchLength, maxBranchLength) // changed from negative value
@@ -179,22 +207,10 @@ const LSystemInstanced = forwardRef( (props, ref) => {
       currentPath[(i + 1) % currentPath.length] === 'X' ||
       (currentPath[(i + 3) % currentPath.length] === 'F' && currentPath[(i + 4) % currentPath.length] === 'X')
     ) {
-      // 🎈 blossoms 와 fruits 분리해야 함
-      //
-      // if (branchLength / maxBranchLength > -0.2 && selectedBlossoms > 0) {
-      //   order_pz = 0.01
-      //   currentObject.meta = meta
-      //   currentObject.meta.type = 'blossoms'
-      //   currentObject.meta.index = Utils.randomRangeInt(0, selectedBlossoms)
-      // } else {
-      //   order_pz = 0.0
-      //   currentObject.meta = meta
-      //   currentObject.meta.type = 'leaves'
-      //   currentObject.meta.index = Utils.randomRangeInt(0, leafImages.length - 1)
-      // }
-      order_pz = 0.0
-      currentObject.type = 'leaf'
-      currentObject.index = Utils.randomRangeInt(0, leafImages.length - 1)
+      // leaf 선택
+      const {type, index} = getLeafAndIndex()
+      currentObject.type = type
+      currentObject.index = index
     } else {
       currentObject.type = 'branch'
       currentObject.index = Utils.randomRangeInt(0, branchImages.length - 1)
@@ -203,29 +219,41 @@ const LSystemInstanced = forwardRef( (props, ref) => {
     //set shape
     //
     let length
-    if (currentObject.type === 'blossoms') {
-      // 🌸🌸🌸 blossom 🌸🌸🌸
+    if (currentObject.type === 'fruit') {
+      // 🍏🍏🍏 fruit 🍏🍏🍏
       length = Utils.randomRange(minPetalLength, maxPetalLength)
       const scale = new Vector3(length, length, length)
       //
       const pos = new Vector3(
-        transform.position.x + 0,
+        transform.position.x,
         transform.position.y + branchLength,
-        transform.position.z + order_pz,
+        transform.position.z,
       )
       const quat = new Quaternion()
       quat.setFromEuler(new Euler(0, 0, MathUtils.degToRad(Utils.randomRange(0, 360)), 'XYZ'))
-      // 🎈
-      if(flowerRef.current) flowerRef.current.setNextMesh(pos, quat, scale, delay)
+      if (fruitRef.current) fruitRef.current.setNextMesh(pos, quat, scale, delay)
+    } else if (currentObject.type === 'flower') {
+      // 🌸🌸🌸 flower 🌸🌸🌸
+      length = Utils.randomRange(minPetalLength, maxPetalLength)
+      const scale = new Vector3(length, length, length)
+      //
+      const pos = new Vector3(
+        transform.position.x,
+        transform.position.y + branchLength,
+        transform.position.z,
+      )
+      const quat = new Quaternion()
+      quat.setFromEuler(new Euler(0, 0, MathUtils.degToRad(Utils.randomRange(0, 360)), 'XYZ'))
+      if (flowerRef.current) flowerRef.current.setNextMesh(pos, quat, scale, delay)
     } else if (currentObject.type === 'leaf') {
       // 🍃🍃🍃 leaves 🍃🍃🍃
       length = Utils.randomRange(minPetalLength, maxPetalLength)
       const scale = new Vector3(length, length, length)
       //
       const pos = new Vector3(
-        transform.position.x + 0,
+        transform.position.x,
         transform.position.y + branchLength,
-        transform.position.z + order_pz,
+        transform.position.z,
       )
       const quat = new Quaternion()
       quat.setFromEuler(new Euler(0, 0, MathUtils.degToRad(Utils.randomRange(0, 360)), 'XYZ'))
@@ -234,7 +262,7 @@ const LSystemInstanced = forwardRef( (props, ref) => {
       // 🌴🌴🌴 branch 🌴🌴🌴
       length = Utils.randomRange(minBranchLength, maxBranchLength)
 
-      console.log("width: ", width, ", length: ", length)
+      console.log('width: ', width, ', length: ', length)
 
       const scale = new Vector3(width, length, width)
       const pos = new Vector3(transform.position.x, transform.position.y, transform.position.z)
@@ -242,7 +270,7 @@ const LSystemInstanced = forwardRef( (props, ref) => {
       quat.setFromEuler(new Euler(transform.rotation.x, transform.rotation.y, transform.rotation.z, 'XYZ'))
       branchRef.current.setNextMesh(pos, quat, scale, delay)
       //
-      transform.translateY(length * 100)
+      transform.translateY(length * 200)
       if (count < setInitPositionNum) initPositions.push(transform.position.clone())
     }
 
@@ -257,7 +285,7 @@ const LSystemInstanced = forwardRef( (props, ref) => {
   const buildMove = () => {
     const g = Utils.randomRangeInt(0, initPositions.length - 1)
     const pos = initPositions[g]
-    console.log("pos: %o", pos)
+    console.log('pos: %o', pos)
     transform.position.set(pos.x, pos.y, pos.z)
     transform.rotation.set(0, 0, 0)
     transform.updateMatrix()

@@ -4,8 +4,9 @@ import { Object3D, Quaternion, TextureLoader, Matrix4, Vector3 } from 'three'
 import { Utils } from '@/components/tree/ThreeHelper'
 
 const TreeInstances = forwardRef((props, ref) => {
-  const { count, path, width, height } = props
+  const { count, path, width, height, type } = props
   const meshRef = useRef()
+  const geometryRef = useRef()
   const temp = new Object3D()
   const texture = useLoader(TextureLoader, path)
   const pool = []
@@ -24,6 +25,21 @@ const TreeInstances = forwardRef((props, ref) => {
       // Update the instance
       meshRef.current.instanceMatrix.needsUpdate = true
     }
+
+    if (geometryRef.current) {
+      let move;
+      if(type==="branch" ) {
+        move = new Vector3(0, height * 0.5, 0)
+      } else if (type==="leaf") {
+        move = new Vector3(0, height * 0.5, 10)
+      } else if (type==="flower") {
+        move = new Vector3(0, 0, 20)
+      } else if (type==="fruit") {
+        move = new Vector3(0, 0, 30)
+      }
+      if(type && move) geometryRef.current.applyMatrix4(new Matrix4().makeTranslation(move.x, move.y, move.z))
+    }
+
   }, [ref])
 
   useImperativeHandle(ref, () => ({
@@ -45,9 +61,9 @@ const TreeInstances = forwardRef((props, ref) => {
 
   return (
     <instancedMesh ref={meshRef} args={[null, null, count]}>
-      <planeBufferGeometry attach='geometry' args={[width, height]} />
+      <planeBufferGeometry attach='geometry' args={[width, height]} ref={geometryRef} />
       {/*<meshBasicMaterial attach='material'  wireframe />*/}
-      <meshBasicMaterial attach='material' map={texture} transparent alphaTest={0.3}  />
+      <meshBasicMaterial attach='material' map={texture} transparent alphaTest={0.3}   />
     </instancedMesh>
   )
 })
