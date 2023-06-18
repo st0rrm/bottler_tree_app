@@ -3,7 +3,7 @@ const gen = require("random-seed");
 
 export const Utils = {
   standardHeight: 1334,
-  ratioScale: 0.01,
+  ratioScale: 0.013,
   screenWidth: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
   screenHeight: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,
   getRatio() {

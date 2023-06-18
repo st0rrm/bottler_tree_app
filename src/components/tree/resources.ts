@@ -1,22 +1,23 @@
 const scale = 1;
+const branchScale = 1.5;
 
 export const branchImages = [
   {
     path: './assets/branch_v1.png',
-    width: 36 * scale,
-    height: 251 * scale,
+    width: 36 * branchScale,
+    height: 251 * branchScale,
     type: 'branch',
   },
   {
     path: './assets/branch_v2.png',
-    width: 36 * scale,
-    height: 230 * scale,
+    width: 36 * branchScale,
+    height: 230 * branchScale,
     type: 'branch',
   },
   {
     path: './assets/branch_v3.png',
-    width: 36 * scale,
-    height: 218 * scale,
+    width: 36 * branchScale,
+    height: 218 * branchScale,
     type: 'branch',
   },
 ]
