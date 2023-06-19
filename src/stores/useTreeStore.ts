@@ -8,7 +8,6 @@ const useTreeStore = create((set, get) => ({
   loadedTexture: () => {
     const total = get().totalTextures
     const loaded = get().texturesLoaded + 1
-    console.log('loaded: ', loaded, " / total:", total )
     set({texturesLoaded: loaded})
     if(loaded===total){
       set({allTexturesLoaded: true})

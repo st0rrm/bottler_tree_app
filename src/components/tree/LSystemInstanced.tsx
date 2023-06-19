@@ -70,7 +70,7 @@ const LSystemInstanced = forwardRef((props, ref) => {
   const resetCount = 3 // 홀수만 설정 가능
   const delayTime = 0.1
   const lengthScale = 0.75
-  const widthScale = 0.95
+  const widthScale = 0.93
   const randomRotations = randomArea(1000)
   const conditionPoints = [50, 150, 250, 350, 450, 500, 600, 700, 800, 900, 1000]
   const conditionRewards = [
@@ -282,7 +282,7 @@ const LSystemInstanced = forwardRef((props, ref) => {
     // console.log("%c branchLength / maxBranchLength: %s", "color:red;", branchLength / maxBranchLength)
     if (branchLength / maxBranchLength < 0.41 && totalPoint > conditionPoints[0]) {
       const reward = getRewardIndex(totalPoint, conditionPoints, conditionRewards)
-      console.log('%c reward: %o', 'color:red;', reward)
+      // console.log('%c reward: %o', 'color:red;', reward)
       if (reward.type === 'fruit') {
         // 🍏🍏🍏 fruit 🍏🍏🍏
         length = randomRange(minPetalLength, maxPetalLength)

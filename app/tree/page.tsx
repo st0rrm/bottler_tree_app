@@ -1,12 +1,11 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Tree from '@/components/tree/Tree'
 import Guide from '@/components/tree/Guide'
 import { LSystemInstanced } from '@/components/tree/LSystemInstanced'
 import Cover from '@/components/tree/Cover'
-import useTreeStore from '@/stores/useTreeStore'
 
 const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.View), { ssr: false })
 const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mod.Common), { ssr: false })
@@ -26,7 +25,7 @@ export default function Page() {
 
   useEffect(() => {
     setTreeView(
-      <View debug={false} className='absolute top-0 flex h-screen w-full flex-col items-center justify-center' orbit>
+      <View debug={true} className='absolute top-0 flex h-screen w-full flex-col items-center justify-center' orbit>
         <Tree>
           <LSystemInstanced ref={treeRef} />
         </Tree>
@@ -43,6 +42,7 @@ export default function Page() {
           GROW
         </button>
       </div>
+      <Cover />
       {treeView}
     </>
   )

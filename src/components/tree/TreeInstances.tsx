@@ -1,25 +1,15 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
-import { Object3D, Quaternion, TextureLoader, Matrix4, Vector3 } from 'three'
-import { useThreeHelper, Utils } from '@/components/tree/ThreeHelper'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import { Matrix4, Object3D, Quaternion, Vector3 } from 'three'
+import { useThreeHelper } from '@/components/tree/ThreeHelper'
 import { useTexture } from '@react-three/drei'
-import useTreeStore from '@/stores/useTreeStore'
-
-
 
 const TreeInstances = forwardRef((props, ref) => {
   const { count, path, width, height, type, onLoaded } = props
-  const [texture, setTexture] = useState(null)
+  const texture = useTexture(path, onLoaded)
   const { ratio } = useThreeHelper()
-  // const handleLoaded = (e) => {
-  //   console.log(e)
-  //   onLoaded()
-  // }
-
   const meshRef = useRef()
   const geometryRef = useRef()
   const temp = new Object3D()
-
-  // const texture = useTexture({map: file}, onLoaded)
   const pool = []
   const tween = []
 
@@ -41,12 +31,6 @@ const TreeInstances = forwardRef((props, ref) => {
   }))
 
   useEffect(() => {
-    const textureLoader = new TextureLoader();
-    const texture = textureLoader.load(path, onLoaded);
-    setTexture(texture)
-  }, [])
-
-  useEffect(() => {
     if (meshRef.current) {
       // Set positions
       for (let i = 0; i < count; i++) {
@@ -60,26 +44,25 @@ const TreeInstances = forwardRef((props, ref) => {
     }
 
     if (geometryRef.current) {
-      let move;
-      if(type==="branch" ) {
+      let move
+      if (type === 'branch') {
         move = new Vector3(0, height * 0.5, 0)
-      } else if (type==="leaf") {
+      } else if (type === 'leaf') {
         move = new Vector3(0, height * 0.5, 10)
-      } else if (type==="flower") {
+      } else if (type === 'flower') {
         move = new Vector3(0, 0, 20)
-      } else if (type==="fruit") {
+      } else if (type === 'fruit') {
         move = new Vector3(0, 0, 30)
       }
-      if(type && move) geometryRef.current.applyMatrix4(new Matrix4().makeTranslation(move.x, move.y, move.z))
+      if (type && move) geometryRef.current.applyMatrix4(new Matrix4().makeTranslation(move.x, move.y, move.z))
     }
-
   }, [ref])
 
   return (
     <instancedMesh ref={meshRef} args={[null, null, count]}>
       <planeBufferGeometry attach='geometry' args={[width, height]} ref={geometryRef} />
-      {! texture && <meshBasicMaterial attach='material'  wireframe /> }
-      {texture && <meshBasicMaterial attach='material' map={texture} transparent alphaTest={0.3}   /> }
+      {!texture && <meshBasicMaterial attach='material' wireframe />}
+      {texture && <meshBasicMaterial attach='material' map={texture} transparent alphaTest={0.3} />}
     </instancedMesh>
   )
 })

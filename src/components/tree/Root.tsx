@@ -21,7 +21,7 @@ const Root = () => {
   return (
     <group>
       {rootShow &&
-      <Plane args={[branch.width, branch.height]} scale={ratio*rootScale}>
+      <Plane args={[branch.width, branch.height]} scale={ratio*rootScale} position={[0, 0.44, 0]}>
         <meshBasicMaterial attach='material' map={textureRoot} transparent alphaTest={0.3} />
       </Plane>
       }
