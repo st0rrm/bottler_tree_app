@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box, Plane, useTexture } from '@react-three/drei'
 import { branchImages } from '@/components/tree/resources'
-import { Utils } from '@/components/tree/ThreeHelper'
+import { useThreeHelper, Utils } from '@/components/tree/ThreeHelper'
 import { useControls } from 'leva'
 
 const Root = () => {
@@ -14,7 +14,7 @@ const Root = () => {
     height: 236,
   }
   const textureHill = useTexture(hill.path)
-  const ratio = Utils.getRatio()
+  const { ratio } = useThreeHelper()
   const rootScale = 1.2
   const hillScale = 6.4
 

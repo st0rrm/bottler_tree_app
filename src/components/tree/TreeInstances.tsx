@@ -1,23 +1,56 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
-import { useLoader } from '@react-three/fiber'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { Object3D, Quaternion, TextureLoader, Matrix4, Vector3 } from 'three'
-import { Utils } from '@/components/tree/ThreeHelper'
+import { useThreeHelper, Utils } from '@/components/tree/ThreeHelper'
+import { useTexture } from '@react-three/drei'
+import useTreeStore from '@/stores/useTreeStore'
+
+
 
 const TreeInstances = forwardRef((props, ref) => {
-  const { count, path, width, height, type } = props
+  const { count, path, width, height, type, onLoaded } = props
+  const [texture, setTexture] = useState(null)
+  const { ratio } = useThreeHelper()
+  // const handleLoaded = (e) => {
+  //   console.log(e)
+  //   onLoaded()
+  // }
+
   const meshRef = useRef()
   const geometryRef = useRef()
   const temp = new Object3D()
-  const texture = useLoader(TextureLoader, path)
+
+  // const texture = useTexture({map: file}, onLoaded)
   const pool = []
   const tween = []
 
+  useImperativeHandle(ref, () => ({
+    setNextMesh: (position: Vector3, quaternion: Quaternion, scale: Vector3, delay: number) => {
+      const id = pool.length
+      const dummy = new Object3D()
+      dummy.position.copy(position)
+      dummy.quaternion.copy(quaternion)
+      dummy.scale.copy(scale)
+      dummy.updateMatrix()
+      pool[id] = dummy
+
+      // console.log('%cinstance.position: %o', 'color:blue', dummy.position)
+
+      meshRef.current.setMatrixAt(id, dummy.matrix)
+      meshRef.current.instanceMatrix.needsUpdate = true
+    },
+  }))
+
+  useEffect(() => {
+    const textureLoader = new TextureLoader();
+    const texture = textureLoader.load(path, onLoaded);
+    setTexture(texture)
+  }, [])
+
   useEffect(() => {
     if (meshRef.current) {
-      const ratio = Utils.getRatio()
       // Set positions
       for (let i = 0; i < count; i++) {
-        temp.position.set(0, -1000, 0)
+        temp.position.set(0, -1, 0)
         temp.scale.set(ratio, ratio, ratio)
         temp.updateMatrix()
         meshRef.current.setMatrixAt(i, temp.matrix)
@@ -42,28 +75,11 @@ const TreeInstances = forwardRef((props, ref) => {
 
   }, [ref])
 
-  useImperativeHandle(ref, () => ({
-    setNextMesh: (position: Vector3, quaternion: Quaternion, scale: Vector3, delay: number) => {
-      const id = pool.length
-      const dummy = new Object3D()
-      dummy.position.copy(position)
-      dummy.quaternion.copy(quaternion)
-      dummy.scale.copy(scale)
-      dummy.updateMatrix()
-      pool[id] = dummy
-
-      // console.log('%cinstance.position: %o', 'color:blue', dummy.position)
-
-      meshRef.current.setMatrixAt(id, dummy.matrix)
-      meshRef.current.instanceMatrix.needsUpdate = true
-    },
-  }))
-
   return (
     <instancedMesh ref={meshRef} args={[null, null, count]}>
       <planeBufferGeometry attach='geometry' args={[width, height]} ref={geometryRef} />
-      {/*<meshBasicMaterial attach='material'  wireframe />*/}
-      <meshBasicMaterial attach='material' map={texture} transparent alphaTest={0.3}   />
+      {! texture && <meshBasicMaterial attach='material'  wireframe /> }
+      {texture && <meshBasicMaterial attach='material' map={texture} transparent alphaTest={0.3}   /> }
     </instancedMesh>
   )
 })

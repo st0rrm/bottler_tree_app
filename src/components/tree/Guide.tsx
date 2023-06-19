@@ -1,16 +1,16 @@
 import React from 'react'
 import { Box, Plane, useTexture } from '@react-three/drei'
-import { Utils } from '@/components/tree/ThreeHelper'
+import { useThreeHelper } from '@/components/tree/ThreeHelper'
 import { useControls } from 'leva'
 const Guide = () => {
-  const { guideShow } = useControls({guideShow:true})
+  const { guideShow } = useControls({guideShow:false})
   const guide = {
     path: "./assets/guide.png",
     width: 390,
     height: 844,
   }
-  const ratio = Utils.getRatio()
   const texture = useTexture(guide.path)
+  const { ratio } = useThreeHelper()
   return (
     <group>
       <Box scale={[1, 1, 1]}>

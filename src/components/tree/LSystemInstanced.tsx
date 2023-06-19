@@ -1,8 +1,9 @@
-import React, { forwardRef, Suspense, useEffect, useImperativeHandle, useRef } from 'react'
-import { Utils } from '@/components/tree/ThreeHelper'
+import React, { forwardRef, Suspense, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { useThreeHelper } from '@/components/tree/ThreeHelper'
 import { Euler, MathUtils, Object3D, Quaternion, Vector3 } from 'three'
 import TreeInstancesPool from '@/components/tree/TreeInstancesPool'
 import { branchImages, flowerImages, fruitImages, leafImages } from '@/components/tree/resources'
+import useTreeStore from '@/stores/useTreeStore'
 
 type meta = {
   type: string | null
@@ -40,11 +41,11 @@ let totalPoint = 0
 let totalCount = 0
 let currentPath = ''
 let delay = 0
-let width = Utils.getPos(1)
-let minPetalLength = Utils.getPos(0.8)
-let maxPetalLength = Utils.getPos(1.8)
-let minBranchLength = Utils.getPos(0.5)
-let maxBranchLength = Utils.getPos(1.5)
+let width = null
+let minPetalLength = null
+let maxPetalLength = null
+let minBranchLength = null
+let maxBranchLength = null
 
 console.log('%c ---- LSYSTEM INSTANCED ----', 'color:red')
 
@@ -56,7 +57,6 @@ console.log('%c ---- LSYSTEM INSTANCED ----', 'color:red')
  *
  */
 const LSystemInstanced = forwardRef((props, ref) => {
-  const { grow } = props
   //
   //constants
   //
@@ -92,23 +92,9 @@ const LSystemInstanced = forwardRef((props, ref) => {
   const leafRef = useRef()
   const flowerRef = useRef()
   const fruitRef = useRef()
-
-  useEffect(() => {
-    console.log("grow: ", grow)
-    if(grow.total>0){
-      generating(grow.total, grow.count, 2)
-    }
-  }, [grow])
-  
-  const generating =  (total, count, generate = 2) => {
-    totalPoint = total
-    totalCount = count
-    console.log("%c total: %s, count: %s, generate: %s", "color:yellow; background:black", total, count, generate)
-    for (let i = 0; i < generate; i++) {
-      currentPath = createPath(axiom, rules, iterations)
-      build()
-    }
-  }
+  const { getPos, randomRangeInt, randomRange, randomDirection } = useThreeHelper()
+  const { loadedTexture } = useTreeStore()
+  const [pool, setPool] = useState(null)
   //
   //hooks
   //
@@ -116,13 +102,30 @@ const LSystemInstanced = forwardRef((props, ref) => {
     generating: (total, count, generate = 2) => {
       totalPoint = total
       totalCount = count
-      console.log("%c total: %s, count: %s, generate: %s", "color:yellow; background:black", total, count, generate)
+      console.log('%c total: %s, count: %s, generate: %s', 'color:yellow; background:black', total, count, generate)
       for (let i = 0; i < generate; i++) {
         currentPath = createPath(axiom, rules, iterations)
         build()
       }
     },
   }))
+  useEffect(() => {
+    width = getPos(1)
+    minPetalLength = getPos(0.8)
+    maxPetalLength = getPos(1.8)
+    minBranchLength = getPos(0.5)
+    maxBranchLength = getPos(1.5)
+  }, [getPos])
+  useEffect(() => {
+    setPool(
+      <group>
+        <TreeInstancesPool ref={branchRef} datas={branchImages} count={1000} onLoaded={onLoaded} />
+        <TreeInstancesPool ref={leafRef} datas={leafImages} count={1000} onLoaded={onLoaded} />
+        <TreeInstancesPool ref={flowerRef} datas={flowerImages} count={100} onLoaded={onLoaded} />
+        <TreeInstancesPool ref={fruitRef} datas={fruitImages} count={100} onLoaded={onLoaded} />
+      </group>,
+    )
+  }, [])
   //
   //functions
   //
@@ -197,7 +200,7 @@ const LSystemInstanced = forwardRef((props, ref) => {
   const getTypeAndIndex = (type, images) => {
     return {
       type,
-      index: Utils.randomRangeInt(0, images.length - 1),
+      index: randomRangeInt(0, images.length - 1),
     }
   }
 
@@ -206,7 +209,7 @@ const LSystemInstanced = forwardRef((props, ref) => {
     const images = { leaf: leafImages, flower: flowerImages, fruit: fruitImages }
 
     const locationType = checkPointLocation(totalPoint, conditionPoints)
-    const randomInt = Utils.randomRangeInt(0, types.length)
+    const randomInt = randomRangeInt(0, types.length)
 
     if (locationType === 'leaf' || types[randomInt] === 'leaf') {
       return getTypeAndIndex('leaf', images.leaf)
@@ -218,20 +221,20 @@ const LSystemInstanced = forwardRef((props, ref) => {
   }
 
   function getRewardIndex(point, points, rewards) {
-    let rewardIndex = 0;
+    let rewardIndex = 0
 
     for (let i = 0; i < points.length; i++) {
       if (point < points[i]) {
-        break;
+        break
       }
-      rewardIndex = i;
+      rewardIndex = i
     }
 
-    return rewards[rewardIndex];
+    return rewards[rewardIndex]
   }
 
   const buildForward = (i) => {
-    let branchLength = Utils.randomRange(minBranchLength, maxBranchLength) // changed from negative value
+    let branchLength = randomRange(minBranchLength, maxBranchLength) // changed from negative value
 
     //sets current object as branch or leaf
     let currentObject = {} as meta
@@ -244,10 +247,10 @@ const LSystemInstanced = forwardRef((props, ref) => {
       // currentObject.type = type
       // currentObject.index = index
       currentObject.type = 'leaf'
-      currentObject.index = Utils.randomRangeInt(0, leafImages.length - 1)
+      currentObject.index = randomRangeInt(0, leafImages.length - 1)
     } else {
       currentObject.type = 'branch'
-      currentObject.index = Utils.randomRangeInt(0, branchImages.length - 1)
+      currentObject.index = randomRangeInt(0, branchImages.length - 1)
     }
     //
     //set shape
@@ -255,21 +258,21 @@ const LSystemInstanced = forwardRef((props, ref) => {
     let length
     if (currentObject.type === 'leaf') {
       // 🍃🍃🍃 leaves 🍃🍃🍃
-      length = Utils.randomRange(minPetalLength, maxPetalLength)
+      length = randomRange(minPetalLength, maxPetalLength)
       const scale = new Vector3(length, length, length)
       //
       const pos = new Vector3(transform.position.x, transform.position.y + branchLength, transform.position.z)
       const quat = new Quaternion()
-      quat.setFromEuler(new Euler(0, 0, MathUtils.degToRad(Utils.randomRange(0, 360)), 'XYZ'))
-      leafRef.current.setNextMesh(Utils.randomRangeInt(0, leafImages.length-1), pos, quat, scale, delay)
+      quat.setFromEuler(new Euler(0, 0, MathUtils.degToRad(randomRange(0, 360)), 'XYZ'))
+      leafRef.current.setNextMesh(randomRangeInt(0, leafImages.length - 1), pos, quat, scale, delay)
     } else {
       // 🌴🌴🌴 branch 🌴🌴🌴
-      length = Utils.randomRange(minBranchLength, maxBranchLength)
+      length = randomRange(minBranchLength, maxBranchLength)
       const scale = new Vector3(width, length, width)
       const pos = new Vector3(transform.position.x, transform.position.y, transform.position.z)
       const quat = new Quaternion()
       quat.setFromEuler(new Euler(transform.rotation.x, transform.rotation.y, transform.rotation.z, 'XYZ'))
-      branchRef.current.setNextMesh(Utils.randomRangeInt(0, branchImages.length-1), pos, quat, scale, delay)
+      branchRef.current.setNextMesh(randomRangeInt(0, branchImages.length - 1), pos, quat, scale, delay)
       //
       transform.translateY(length * 180)
       if (growCount < setInitPositionNum) initPositions.push(transform.position.clone())
@@ -277,42 +280,39 @@ const LSystemInstanced = forwardRef((props, ref) => {
 
     // Reward
     // console.log("%c branchLength / maxBranchLength: %s", "color:red;", branchLength / maxBranchLength)
-    if (branchLength / maxBranchLength < 0.41 && totalPoint > conditionPoints[0] ){
-      const reward = getRewardIndex(totalPoint, conditionPoints, conditionRewards);
-      console.log("%c reward: %o", "color:red;", reward)
+    if (branchLength / maxBranchLength < 0.41 && totalPoint > conditionPoints[0]) {
+      const reward = getRewardIndex(totalPoint, conditionPoints, conditionRewards)
+      console.log('%c reward: %o', 'color:red;', reward)
       if (reward.type === 'fruit') {
         // 🍏🍏🍏 fruit 🍏🍏🍏
-        length = Utils.randomRange(minPetalLength, maxPetalLength)
+        length = randomRange(minPetalLength, maxPetalLength)
         const scale = new Vector3(length, length, length)
         const pos = new Vector3(transform.position.x, transform.position.y + branchLength, transform.position.z)
         const quat = new Quaternion()
-        quat.setFromEuler(new Euler(0, 0, MathUtils.degToRad(Utils.randomRange(0, 360)), 'XYZ'))
+        quat.setFromEuler(new Euler(0, 0, MathUtils.degToRad(randomRange(0, 360)), 'XYZ'))
         if (fruitRef.current) fruitRef.current.setNextMesh(reward.index, pos, quat, scale, delay)
       } else if (reward.type === 'flower') {
         // 🌸🌸🌸 flower 🌸🌸🌸
-        length = Utils.randomRange(minPetalLength, maxPetalLength)
+        length = randomRange(minPetalLength, maxPetalLength)
         const scale = new Vector3(length, length, length)
         const pos = new Vector3(transform.position.x, transform.position.y + branchLength, transform.position.z)
         const quat = new Quaternion()
-        quat.setFromEuler(new Euler(0, 0, MathUtils.degToRad(Utils.randomRange(0, 360)), 'XYZ'))
+        quat.setFromEuler(new Euler(0, 0, MathUtils.degToRad(randomRange(0, 360)), 'XYZ'))
         if (flowerRef.current) flowerRef.current.setNextMesh(reward.index, pos, quat, scale, delay)
       }
     }
-
-
 
     // console.log("%ctransform.position: %o", "color:red", transform.position)
 
     delay += delayTime
   }
   const buildRotate = (i) => {
-    let p = Utils.randomDirection() * angle * (1 + (variance / 100) * randomRotations[i % randomRotations.length])
+    let p = randomDirection() * angle * (1 + (variance / 100) * randomRotations[i % randomRotations.length])
     transform.rotateZ(MathUtils.degToRad(p))
   }
   const buildMove = () => {
-    const g = Utils.randomRangeInt(0, initPositions.length - 1)
+    const g = randomRangeInt(0, initPositions.length - 1)
     const pos = initPositions[g]
-    console.log('pos: %o', pos)
     transform.position.set(pos.x, pos.y, pos.z)
     transform.rotation.set(0, 0, 0)
     transform.updateMatrix()
@@ -339,16 +339,11 @@ const LSystemInstanced = forwardRef((props, ref) => {
     transform.updateMatrix()
   }
 
-  return (
-    <Suspense fallback={null}>
-    <group {...props}>
-      <TreeInstancesPool ref={branchRef} datas={branchImages} count={1000} />
-      <TreeInstancesPool ref={leafRef} datas={leafImages} count={1000} />
-      <TreeInstancesPool ref={flowerRef} datas={flowerImages} count={100} />
-      <TreeInstancesPool ref={fruitRef} datas={fruitImages} count={100} />
-    </group>
-    </Suspense>
-  )
+  const onLoaded = (e) => {
+    loadedTexture()
+  }
+
+  return <group {...props}>{pool}</group>
 })
 
-export {LSystemInstanced}
+export { LSystemInstanced }

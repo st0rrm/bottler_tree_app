@@ -1,6 +1,8 @@
 const scale = 1;
 const branchScale = 1.5;
 
+
+
 export const branchImages = [
   {
     path: './assets/branch_v1.png',
@@ -78,6 +80,7 @@ export const fruitImages = [
     path: './assets/fruit_v4.png',
     width: 65 * scale,
     height: 63 * scale,
+    type: 'fruit',
   },
   {
     path: './assets/fruit_v5.png',
