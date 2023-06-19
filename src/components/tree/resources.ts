@@ -1,5 +1,6 @@
 const scale = 1;
 const branchScale = 1.5;
+const fruitScale = 1.5;
 
 
 
@@ -60,38 +61,38 @@ export const flowerImages = [
 export const fruitImages = [
   {
     path: './assets/fruit_v1.png',
-    width: 59 * scale,
-    height: 62 * scale,
+    width: 59 * fruitScale,
+    height: 62 * fruitScale,
     type: 'fruit',
   },
   {
     path: './assets/fruit_v2.png',
-    width: 62 * scale,
-    height: 64 * scale,
+    width: 62 * fruitScale,
+    height: 64 * fruitScale,
     type: 'fruit',
   },
   {
     path: './assets/fruit_v3.png',
-    width: 58 * scale,
-    height: 55 * scale,
+    width: 58 * fruitScale,
+    height: 55 * fruitScale,
     type: 'fruit',
   },
   {
     path: './assets/fruit_v4.png',
-    width: 65 * scale,
-    height: 63 * scale,
+    width: 65 * fruitScale,
+    height: 63 * fruitScale,
     type: 'fruit',
   },
   {
     path: './assets/fruit_v5.png',
-    width: 75 * scale,
-    height: 65 * scale,
+    width: 75 * fruitScale,
+    height: 65 * fruitScale,
     type: 'fruit',
   },
   {
     path: './assets/fruit_v6.png',
-    width: 75 * scale,
-    height: 65 * scale,
+    width: 75 * fruitScale,
+    height: 65 * fruitScale,
     type: 'fruit',
   },
 ]

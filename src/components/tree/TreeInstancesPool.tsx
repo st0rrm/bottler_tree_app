@@ -6,24 +6,7 @@ import { createRef, forwardRef, useEffect, useImperativeHandle, useRef, useState
 
 const TreeInstancesPool = forwardRef((props, ref) => {
   const { datas, count, onLoaded } = props
-  const [pool, setPool] = useState([])
   const refs = useRef(datas.map(() => createRef()))
-
-  // useEffect(() => {
-  //   const temp = datas.map((data, index) => (
-  //     <TreeInstances
-  //       ref={refs.current[index]}
-  //       count={count}
-  //       path={data.path}
-  //       width={data.width}
-  //       height={data.height}
-  //       type={data.type}
-  //       key={nanoid()}
-  //       onLoaded={onLoaded}
-  //     />
-  //   ))
-  //   setPool(temp)
-  // }, [datas, count, onLoaded])
 
   useImperativeHandle(ref, () => ({
     setNextMesh: (index, position, quaternion, scale, delay) => {

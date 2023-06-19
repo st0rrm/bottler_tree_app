@@ -111,10 +111,10 @@ const LSystemInstanced = forwardRef((props, ref) => {
   }))
   useEffect(() => {
     width = getPos(1)
-    minPetalLength = getPos(0.8)
-    maxPetalLength = getPos(1.8)
-    minBranchLength = getPos(0.5)
-    maxBranchLength = getPos(1.5)
+    minPetalLength = getPos(1.400001)
+    maxPetalLength = getPos(1.800009)
+    minBranchLength = getPos(0.50001)
+    maxBranchLength = getPos(1.50009)
   }, [getPos])
   useEffect(() => {
     setPool(
@@ -242,10 +242,6 @@ const LSystemInstanced = forwardRef((props, ref) => {
       currentPath[(i + 1) % currentPath.length] === 'X' ||
       (currentPath[(i + 3) % currentPath.length] === 'F' && currentPath[(i + 4) % currentPath.length] === 'X')
     ) {
-      // leaf 선택
-      // const {type, index} = getLeafAndIndex()
-      // currentObject.type = type
-      // currentObject.index = index
       currentObject.type = 'leaf'
       currentObject.index = randomRangeInt(0, leafImages.length - 1)
     } else {
@@ -279,10 +275,10 @@ const LSystemInstanced = forwardRef((props, ref) => {
     }
 
     // Reward
-    // console.log("%c branchLength / maxBranchLength: %s", "color:red;", branchLength / maxBranchLength)
-    if (branchLength / maxBranchLength < 0.41 && totalPoint > conditionPoints[0]) {
+    const r = Math.random()
+    if ( currentObject.type==="leaf" && r < 0.03 && totalPoint > conditionPoints[0]) {
       const reward = getRewardIndex(totalPoint, conditionPoints, conditionRewards)
-      // console.log('%c reward: %o', 'color:red;', reward)
+      console.log('%c r: %s, reward: %o', 'color:red;', r, reward)
       if (reward.type === 'fruit') {
         // 🍏🍏🍏 fruit 🍏🍏🍏
         length = randomRange(minPetalLength, maxPetalLength)

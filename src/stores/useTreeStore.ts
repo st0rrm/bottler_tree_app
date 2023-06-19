@@ -2,6 +2,10 @@ import {create} from "zustand";
 import { branchImages, flowerImages, fruitImages, leafImages } from '@/components/tree/resources'
 
 const useTreeStore = create((set, get) => ({
+  total: 0,
+  setTotal: (t: number) => set({total: t}),
+  count: 0,
+  setCount: (t: number) => set({count: t}),
   totalTextures: branchImages.length + flowerImages.length + fruitImages.length + leafImages.length,
   texturesLoaded: 0,
   allTexturesLoaded: false,

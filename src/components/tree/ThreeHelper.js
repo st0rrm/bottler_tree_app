@@ -1,5 +1,6 @@
 import {Mesh, MeshStandardMaterial, PlaneGeometry} from "three";
 import { useEffect, useState } from 'react'
+import { nanoid } from 'nanoid'
 const gen = require("random-seed");
 
 export const useThreeHelper = () => {
@@ -15,7 +16,7 @@ export const useThreeHelper = () => {
   //
   const standardHeight = 1334
   const ratioScale = 0.013
-  const rand = new gen(new Date().getTime());
+  const rand = new gen(nanoid());
   //
   // hooks
   //
@@ -43,11 +44,11 @@ export const useThreeHelper = () => {
     return x * ratio;
   }
   const randomRange = (min, max) => {
-    rand.seed(new Date().getTime());
+    rand.seed(nanoid());
     return rand.floatBetween(min, max)
   }
   const randomRangeInt = (min, max) => {
-    rand.seed(new Date().getTime());
+    rand.seed(nanoid());
     return rand.intBetween(min, max);
   }
   const randomDirection = () => {
