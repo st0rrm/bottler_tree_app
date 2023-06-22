@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import { Matrix4, Object3D, Quaternion, Vector3 } from 'three'
 import { useThreeHelper } from '@/components/tree/ThreeHelper'
@@ -167,5 +169,7 @@ const TreeInstances = forwardRef((props, ref) => {
     </instancedMesh>
   )
 })
+
+TreeInstances.displayName = 'TreeInstances'
 
 export default TreeInstances

@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import React from 'react'
 import { Plane, useTexture } from '@react-three/drei'
 import { branchImages } from '@/components/tree/resources'

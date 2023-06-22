@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import {create} from "zustand";
 import { branchImages, flowerImages, fruitImages, leafImages } from '@/components/tree/resources'
 

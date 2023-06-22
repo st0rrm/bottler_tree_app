@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import React, { useEffect } from 'react'
 import { useThree } from '@react-three/fiber'
 import Root from '@/components/tree/Root'

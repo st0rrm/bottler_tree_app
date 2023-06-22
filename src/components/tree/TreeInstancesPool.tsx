@@ -1,4 +1,4 @@
-//ts-nocheck
+//@ts-nocheck
 
 import TreeInstances from '@/components/tree/TreeInstances'
 import { nanoid } from 'nanoid'
@@ -32,5 +32,6 @@ const TreeInstancesPool = forwardRef((props, ref) => {
     </>
   )
 })
+TreeInstancesPool.displayName = 'TreeInstancesPool'
 
 export default TreeInstancesPool

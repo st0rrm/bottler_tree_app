@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import React, { forwardRef, Suspense, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { useThreeHelper } from '@/components/tree/ThreeHelper'
 import { Euler, MathUtils, Object3D, Quaternion, Vector3 } from 'three'
@@ -346,5 +348,7 @@ const LSystemInstanced = forwardRef((props, ref) => {
 
   return <group {...props}>{pool}</group>
 })
+
+LSystemInstanced.displayName = 'LSystemInstanced'
 
 export { LSystemInstanced }

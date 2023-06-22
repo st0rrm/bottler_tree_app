@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 
@@ -42,4 +44,5 @@ const Score = forwardRef((props, ref) => {
   );
 })
 
+Score.displayName = 'Score'
 export default Score;

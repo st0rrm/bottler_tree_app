@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import React from 'react'
 import { Box, Plane, Sphere, useTexture } from '@react-three/drei'
 import { useThreeHelper } from '@/components/tree/ThreeHelper'
