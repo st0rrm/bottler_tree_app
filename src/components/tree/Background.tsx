@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { createRef, useEffect, useRef, useState } from 'react'
 import { Plane, useTexture } from '@react-three/drei'
 import useTreeStore from '@/stores/useTreeStore'
 import { useFrame, useThree } from '@react-three/fiber'
@@ -20,7 +20,18 @@ const Background = () => {
     '/assets/backgrounds/700.jpg',
     '/assets/backgrounds/800.jpg',
   ])
-  const meshesRef = backgrounds.map(() => useRef(null)); // create array of refs here instead of within map function
+  const meshesRef = backgrounds.map(() => createRef()); // create array of refs here instead of within map function\
+
+  //const meshRefs = Array(backgrounds.length).fill(0).map(() => useRef(null)); // Moved useRef calls out of map function
+
+  // const [meshRefs, setMeshRefs] = useState([]); // use state to keep track of refs
+  // useEffect(() => {
+  //   setMeshRefs((meshRefs) => Array(backgrounds.length).fill().map((_, i) => meshRefs[i] || createRef())); // initialize refs in useEffect
+  // }, [backgrounds]);
+
+
+
+
   const object = useTexture('/assets/backgrounds/bg_objects.png')
   const { width, height } = useThree((state) => state.viewport)
 
@@ -56,7 +67,7 @@ const Background = () => {
       <Plane ref={objRef} args={[width, width * (1086 / 1255)]} position={[0, height / 2 - 12, -0.9]}>
         <meshBasicMaterial attach='material' map={object} transparent opacity={0} />
       </Plane>
-      {backgrounds.map((background, index) => (
+      {meshesRef && backgrounds.map((background, index) => (
         <Plane key={index} ref={meshesRef[index]} args={[height, height]} position={[0, 0, -1.1 - index * 0.1]}>
           <meshBasicMaterial attach='material' map={background} transparent opacity={0} />
         </Plane>

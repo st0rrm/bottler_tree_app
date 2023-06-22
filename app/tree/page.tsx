@@ -53,9 +53,15 @@ export default function Page() {
   return (
     <>
       <Leva hidden={true} />
-      <div className={'fixed w-24 h-16 bottom-16 right-0 bg-amber-300 z-40'}>
+      <div className={'fixed w-24 h-16 bottom-40 right-0 bg-amber-300 z-40'}>
         <button onClick={()=>handleGrow(5)} className={'w-full h-full'}>
-          GROW
+          GROW + 5
+        </button>
+      </div>
+
+      <div className={'fixed w-24 h-16 bottom-16 right-0 bg-amber-300 z-40'}>
+        <button onClick={()=>handleGrow(100)} className={'w-full h-full'}>
+          GROW + 100
         </button>
       </div>
       {/*<div className={'fixed w-24 h-16 bottom-16 left-0 bg-amber-300 z-40'}>*/}
