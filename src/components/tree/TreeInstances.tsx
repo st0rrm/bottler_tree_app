@@ -24,12 +24,12 @@ const TreeInstances = forwardRef((props, ref) => {
 
   const typeConfigs = {
     'leaf': {
-      distanceThreshold: 0.2,
+      distanceThreshold: 0.01,
       duration: 1,
       calculateY: (y) => y - 3,
     },
     'flower': {
-      distanceThreshold: 0.3,
+      distanceThreshold: 0.8,
       duration: 4,
       calculateY: (y) => y * -3,
     }

@@ -99,6 +99,9 @@ const LSystemInstanced = forwardRef((props, ref) => {
   //hooks
   //
   useImperativeHandle(ref, () => ({
+    init: (total, count) => {
+
+    },
     generating: (total, count, generate = 2) => {
       totalPoint = total
       totalCount = count
@@ -109,13 +112,15 @@ const LSystemInstanced = forwardRef((props, ref) => {
       }
     },
   }))
+  //
   useEffect(() => {
     width = getPos(1)
     minPetalLength = getPos(1.400001)
-    maxPetalLength = getPos(1.800009)
+    maxPetalLength = getPos(1.900009)
     minBranchLength = getPos(0.50001)
     maxBranchLength = getPos(1.50009)
   }, [getPos])
+  //
   useEffect(() => {
     setPool(
       <group>
