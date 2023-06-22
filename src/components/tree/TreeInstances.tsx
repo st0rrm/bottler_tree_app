@@ -10,6 +10,9 @@ type Item = {
   complete: boolean
 }
 
+
+
+
 const TreeInstances = forwardRef((props, ref) => {
   const { count, path, width, height, type, onLoaded } = props
   const texture = useTexture(path, onLoaded)
@@ -19,39 +22,59 @@ const TreeInstances = forwardRef((props, ref) => {
   const temp = new Object3D()
   const pool = []
 
+  const typeConfigs = {
+    'leaf': {
+      distanceThreshold: 0.2,
+      duration: 1,
+      calculateY: (y) => y - 3,
+    },
+    'flower': {
+      distanceThreshold: 0.3,
+      duration: 4,
+      calculateY: (y) => y * -3,
+    }
+  }
+
+  const animateAndShrink = (existingDummy, duration, calculateY) => {
+    const existingObject = existingDummy.object;
+
+    gsap.to(existingObject.position, {
+      x: existingObject.position.x,
+      y: calculateY(existingObject.position.y),
+      z: existingObject.position.z,
+      duration,
+      ease: 'power1.in',
+      onUpdate: () => {
+        existingObject.updateMatrix();
+        meshRef.current.setMatrixAt(pool.indexOf(existingDummy), existingObject.matrix);
+        meshRef.current.instanceMatrix.needsUpdate = true;
+      },
+    });
+
+    gsap.to(existingObject.scale, {
+      x: 0.00001, // new x scale
+      y: 0.00001, // new y scale
+      z: 0.00001, // new z scale
+      duration,
+      ease: 'power1.in',
+      onUpdate: () => {
+        existingObject.updateMatrix();
+        meshRef.current.setMatrixAt(pool.indexOf(existingDummy), existingObject.matrix);
+        meshRef.current.instanceMatrix.needsUpdate = true;
+      }
+    });
+  }
+
   const testCollision = (obj) => {
-    //
-    // Check if there is a mesh close to the new mesh
-    //
-    const distanceThreshold = 0.2
     for (const existingDummy of pool) {
-      if (!existingDummy.complete || type === 'branch') continue
-      const existingObject = existingDummy.object
-      const dist = existingObject.position.distanceTo(obj.position)
+      if (existingDummy.complete && (type === "leaf" || type === "flower")) {
+        const typeConfig = typeConfigs[type];
+        const dist = existingDummy.object.position.distanceTo(obj.position);
 
-      if (dist < distanceThreshold) {
-        // console.log('%cdist: %o', 'color:blue', dist)
-        // console.log('%cexistingObject.position: %o', 'color:red', existingObject.position)
-        // Animate the existing mesh away and then remove it
-        gsap.to(existingObject.position, {
-          x: existingObject.position.x,
-          y: existingObject.position.y * -3,
-          z: existingObject.position.z,
-          duration: 4,
-          ease: 'power1.in',
-          onUpdate: () => {
-            existingObject.updateMatrix()
-            meshRef.current.setMatrixAt(pool.indexOf(existingDummy), existingObject.matrix)
-            meshRef.current.instanceMatrix.needsUpdate = true
-          },
-          onComplete: () => {
-            // Remove the mesh after the animation is done
-            // pool.splice(pool.indexOf(existingDummy), 1)
-          },
-        })
-
-        // Stop processing as we've found a close mesh
-        break
+        if (dist < typeConfig.distanceThreshold) {
+          animateAndShrink(existingDummy, typeConfig.duration, typeConfig.calculateY);
+          break;
+        }
       }
     }
   }
