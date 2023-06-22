@@ -21,7 +21,7 @@ export default function Page() {
   const handleGrow = () => {
     const next = count + 1
     const total = next * 10
-    treeRef.current.generating(total, next, 2)
+    treeRef.current.generating(total, next, 1)
     setCount(next)
     setTotal(total)
   }

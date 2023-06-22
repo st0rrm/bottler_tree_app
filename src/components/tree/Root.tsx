@@ -9,14 +9,14 @@ const Root = () => {
   const branch = branchImages[0]
   const textureRoot = useTexture(branch.path)
   const hill = {
-    path: "./assets/front_hill.png",
-    width: 640,
-    height: 236,
+    path: "./assets/front_hills_new.png",
+    width: 1100,
+    height: 204,
   }
   const textureHill = useTexture(hill.path)
   const { ratio } = useThreeHelper()
   const rootScale = 1.2
-  const hillScale = 6.4
+  const hillScale = 4
 
   return (
     <group>
@@ -26,7 +26,7 @@ const Root = () => {
       </Plane>
       }
       {hillShow &&
-      <Plane args={[hill.width, hill.height]} scale={ratio*hillScale} position={[2.4, -6.2, -0.1]}>
+      <Plane args={[hill.width, hill.height]} scale={ratio*hillScale} position={[0, -2.4, -0.1]}>
         <meshBasicMaterial attach='material' map={textureHill} transparent alphaTest={0.3} />
       </Plane>
       }
