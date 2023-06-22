@@ -57,11 +57,11 @@ export default function Page() {
           GROW
         </button>
       </div>
-      <div className={'fixed w-24 h-16 bottom-16 left-0 bg-amber-300 z-40'}>
-        <button onClick={handleInit} className={'w-full h-full'}>
-          INIT
-        </button>
-      </div>
+      {/*<div className={'fixed w-24 h-16 bottom-16 left-0 bg-amber-300 z-40'}>*/}
+      {/*  <button onClick={handleInit} className={'w-full h-full'}>*/}
+      {/*    INIT*/}
+      {/*  </button>*/}
+      {/*</div>*/}
       <Cover />
       <Score ref={scoreRef} />
       {treeView}
