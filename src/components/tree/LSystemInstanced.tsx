@@ -48,6 +48,7 @@ let minPetalLength = null
 let maxPetalLength = null
 let minBranchLength = null
 let maxBranchLength = null
+let animation = true
 
 console.log('%c ---- LSYSTEM INSTANCED ----', 'color:red')
 
@@ -102,12 +103,20 @@ const LSystemInstanced = forwardRef((props, ref) => {
   //
   useImperativeHandle(ref, () => ({
     init: (total, count) => {
-
-    },
-    generating: (total, count, generate = 2) => {
+      animation = false
       totalPoint = total
       totalCount = count
-      console.log('%c total: %s, count: %s, generate: %s', 'color:yellow; background:black', total, count, generate)
+      console.log('%c INIT:: total: %s, count: %s', 'color:black; background:yellow', total, count)
+      for (let i = 0; i < count; i++) {
+        currentPath = createPath(axiom, rules, iterations)
+        build()
+      }
+    },
+    generating: (total, count, generate = 2) => {
+      animation = true
+      totalPoint = total
+      totalCount = count
+      console.log('%c GENERATING:: total: %s, count: %s, generate: %s', 'color:yellow; background:black', total, count, generate)
       for (let i = 0; i < generate; i++) {
         currentPath = createPath(axiom, rules, iterations)
         build()
@@ -211,33 +220,24 @@ const LSystemInstanced = forwardRef((props, ref) => {
     }
   }
 
-  const getLeafAndIndex = () => {
-    const types = ['leaf', 'flower', 'fruit']
-    const images = { leaf: leafImages, flower: flowerImages, fruit: fruitImages }
-
-    const locationType = checkPointLocation(totalPoint, conditionPoints)
-    const randomInt = randomRangeInt(0, types.length)
-
-    if (locationType === 'leaf' || types[randomInt] === 'leaf') {
-      return getTypeAndIndex('leaf', images.leaf)
-    } else if (locationType === 'flower' || types[randomInt] === 'flower') {
-      return getTypeAndIndex('flower', images.flower)
-    } else {
-      return getTypeAndIndex('fruit', images.fruit)
-    }
-  }
-
-  function getRewardIndex(point, points, rewards) {
-    let rewardIndex = 0
+  const getRewardIndex = (point, points, rewards, isAscending = true) => {
+    let rewardIndices = []
 
     for (let i = 0; i < points.length; i++) {
       if (point < points[i]) {
         break
       }
-      rewardIndex = i
+      // The repetition factor determines how many times each index is added to rewardIndices.
+      // If isAscending is true, then higher indices will be repeated more.
+      // If isAscending is false, then lower indices will be repeated more.
+      let repetitionFactor = isAscending ? i + 1 : points.length - i;
+      for (let j = 0; j < repetitionFactor; j++) {
+        rewardIndices.push(i);
+      }
     }
 
-    return rewards[rewardIndex]
+    let randomIndex = randomRangeInt(0, rewardIndices.length - 1);
+    return rewards[rewardIndices[randomIndex]];
   }
 
   const buildForward = (i) => {
@@ -267,7 +267,7 @@ const LSystemInstanced = forwardRef((props, ref) => {
       const pos = new Vector3(transform.position.x, transform.position.y + branchLength, transform.position.z)
       const quat = new Quaternion()
       quat.setFromEuler(new Euler(0, 0, MathUtils.degToRad(randomRange(0, 360)), 'XYZ'))
-      leafRef.current.setNextMesh(randomRangeInt(0, leafImages.length - 1), pos, quat, scale, delay)
+      leafRef.current.setNextMesh(randomRangeInt(0, leafImages.length - 1), pos, quat, scale, delay, animation)
     } else {
       // 🌴🌴🌴 branch 🌴🌴🌴
       length = randomRange(minBranchLength, maxBranchLength)
@@ -275,7 +275,7 @@ const LSystemInstanced = forwardRef((props, ref) => {
       const pos = new Vector3(transform.position.x, transform.position.y, transform.position.z)
       const quat = new Quaternion()
       quat.setFromEuler(new Euler(transform.rotation.x, transform.rotation.y, transform.rotation.z, 'XYZ'))
-      branchRef.current.setNextMesh(randomRangeInt(0, branchImages.length - 1), pos, quat, scale, delay)
+      branchRef.current.setNextMesh(randomRangeInt(0, branchImages.length - 1), pos, quat, scale, delay, animation)
       //
       transform.translateY(length * 180)
       if (growCount < setInitPositionNum) initPositions.push(transform.position.clone())
@@ -284,7 +284,7 @@ const LSystemInstanced = forwardRef((props, ref) => {
     // Reward
     const r = Math.random()
     if ( currentObject.type==="leaf" && r < 0.03 && totalPoint > conditionPoints[0]) {
-      const reward = getRewardIndex(totalPoint, conditionPoints, conditionRewards)
+      const reward = getRewardIndex(totalPoint, conditionPoints, conditionRewards, false)
       console.log('%c r: %s, reward: %o', 'color:red;', r, reward)
       if (reward.type === 'fruit') {
         // 🍏🍏🍏 fruit 🍏🍏🍏
@@ -293,7 +293,7 @@ const LSystemInstanced = forwardRef((props, ref) => {
         const pos = new Vector3(transform.position.x, transform.position.y + branchLength, transform.position.z)
         const quat = new Quaternion()
         quat.setFromEuler(new Euler(0, 0, MathUtils.degToRad(randomRange(0, 360)), 'XYZ'))
-        if (fruitRef.current) fruitRef.current.setNextMesh(reward.index, pos, quat, scale, delay)
+        if (fruitRef.current) fruitRef.current.setNextMesh(reward.index, pos, quat, scale, delay, animation)
       } else if (reward.type === 'flower') {
         // 🌸🌸🌸 flower 🌸🌸🌸
         length = randomRange(minPetalLength, maxPetalLength)
@@ -301,7 +301,7 @@ const LSystemInstanced = forwardRef((props, ref) => {
         const pos = new Vector3(transform.position.x, transform.position.y + branchLength, transform.position.z)
         const quat = new Quaternion()
         quat.setFromEuler(new Euler(0, 0, MathUtils.degToRad(randomRange(0, 360)), 'XYZ'))
-        if (flowerRef.current) flowerRef.current.setNextMesh(reward.index, pos, quat, scale, delay)
+        if (flowerRef.current) flowerRef.current.setNextMesh(reward.index, pos, quat, scale, delay, animation)
       }
     }
 

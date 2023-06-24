@@ -16,7 +16,7 @@ const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.
 const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mod.Common), { ssr: false })
 
 export default function Page() {
-  const { total, count, setCount, setTotal } = useTreeStore()
+  const { total, count, setCount, setTotal, setInitThree } = useTreeStore()
   const scoreRef = useRef()
   const treeRef = useRef()
   const [treeView, setTreeView] = useState(null) // useState 추가
@@ -31,10 +31,11 @@ export default function Page() {
   }
 
   const handleInit = () => {
-    const {t,c} = {t:50, c:10}
+    const {t,c} = {t:800, c:60}
     treeRef.current.init(t, c)
-    setCount(t)
-    setTotal(c)
+    setCount(c)
+    setTotal(t)
+    setInitThree(true)
   }
 
   useEffect(() => {
@@ -60,8 +61,8 @@ export default function Page() {
       </div>
 
       <div className={'fixed w-24 h-16 bottom-16 right-0 bg-amber-300 z-40'}>
-        <button onClick={()=>handleGrow(100)} className={'w-full h-full'}>
-          GROW + 100
+        <button onClick={()=>handleInit()} className={'w-full h-full'}>
+          INIT + 800
         </button>
       </div>
       {/*<div className={'fixed w-24 h-16 bottom-16 left-0 bg-amber-300 z-40'}>*/}

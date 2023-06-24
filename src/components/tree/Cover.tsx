@@ -28,7 +28,7 @@ const Cover = () => {
   };
 
   return !hide ? (
-    <div style={styles} className="absolute w-full h-full bg-[#EFEFED] z-40" />
+    <div style={styles} className="absolute w-full h-full bg-[#EFEFED] z-30" />
   ) : null;
 }
 

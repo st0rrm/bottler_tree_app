@@ -82,7 +82,7 @@ const TreeInstances = forwardRef((props, ref) => {
   }
 
   useImperativeHandle(ref, () => ({
-    setNextMesh: (position: Vector3, quaternion: Quaternion, scale: Vector3, delay: number) => {
+    setNextMesh: (position: Vector3, quaternion: Quaternion, scale: Vector3, delay: number, animation: true) => {
       const id = pool.length
       const obj = new Object3D()
       obj.position.copy(position)
@@ -100,36 +100,45 @@ const TreeInstances = forwardRef((props, ref) => {
 
       // console.log('%cinstance.position: %o', 'color:blue', dummy.position)
 
-      gsap.fromTo(
-        pool[id].object.scale,
-        { x: 0, y: 0, z: 0 },
-        {
-          x: scale.x,
-          y: scale.y,
-          z: scale.z,
-          delay: delay,
-          duration: 1,
-          ease: 'power1.out',
-          onUpdate: () => {
-            if (pool[id]) {
-              pool[id].object.updateMatrix()
-              meshRef.current.setMatrixAt(id, pool[id].object.matrix)
-              meshRef.current.instanceMatrix.needsUpdate = true
-            }
+      if(animation){
+        gsap.fromTo(
+          pool[id].object.scale,
+          { x: 0, y: 0, z: 0 },
+          {
+            x: scale.x,
+            y: scale.y,
+            z: scale.z,
+            delay: delay,
+            duration: 1,
+            ease: 'power1.out',
+            onUpdate: () => {
+              if (pool[id]) {
+                pool[id].object.updateMatrix()
+                meshRef.current.setMatrixAt(id, pool[id].object.matrix)
+                meshRef.current.instanceMatrix.needsUpdate = true
+              }
+            },
+            onComplete: () => {
+              if (pool[id]) {
+                testCollision(pool[id].object)
+                pool[id].complete = true
+              }
+            },
           },
-          onComplete: () => {
-            if (pool[id]) {
-              testCollision(pool[id].object)
-              pool[id].complete = true
-            }
-          },
-        },
-      )
+        )
+      } else {
+        if (pool[id]) {
+          pool[id].object.position.copy(position)
+          pool[id].object.quaternion.copy(quaternion)
+          pool[id].object.scale.copy(scale)
+          pool[id].object.updateMatrix()
+          meshRef.current.setMatrixAt(id, pool[id].object.matrix)
+          meshRef.current.instanceMatrix.needsUpdate = true
 
-      // meshRef.current.setMatrixAt(id, obj.matrix)
-      // meshRef.current.instanceMatrix.needsUpdate = true
-
-      // console.log('%csetNextMesh: %o', 'color:blue', pool)
+          testCollision(pool[id].object)
+          pool[id].complete = true
+        }
+      }
     },
   }))
 

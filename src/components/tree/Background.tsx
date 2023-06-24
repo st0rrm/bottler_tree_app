@@ -21,17 +21,6 @@ const Background = () => {
     '/assets/backgrounds/800.jpg',
   ])
   const meshesRef = backgrounds.map(() => createRef()); // create array of refs here instead of within map function\
-
-  //const meshRefs = Array(backgrounds.length).fill(0).map(() => useRef(null)); // Moved useRef calls out of map function
-
-  // const [meshRefs, setMeshRefs] = useState([]); // use state to keep track of refs
-  // useEffect(() => {
-  //   setMeshRefs((meshRefs) => Array(backgrounds.length).fill().map((_, i) => meshRefs[i] || createRef())); // initialize refs in useEffect
-  // }, [backgrounds]);
-
-
-
-
   const object = useTexture('/assets/backgrounds/bg_objects.png')
   const { width, height } = useThree((state) => state.viewport)
 

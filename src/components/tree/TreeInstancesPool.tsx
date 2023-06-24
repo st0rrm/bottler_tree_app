@@ -9,8 +9,8 @@ const TreeInstancesPool = forwardRef((props, ref) => {
   const refs = useRef(datas.map(() => createRef()))
 
   useImperativeHandle(ref, () => ({
-    setNextMesh: (index, position, quaternion, scale, delay) => {
-      if(refs.current[index].current) refs.current[index].current.setNextMesh(position, quaternion, scale, delay)
+    setNextMesh: (index, position, quaternion, scale, delay, animation) => {
+      if(refs.current[index].current) refs.current[index].current.setNextMesh(position, quaternion, scale, delay, animation)
     },
   }))
 
