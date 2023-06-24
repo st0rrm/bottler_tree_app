@@ -21,17 +21,17 @@ export default function Page() {
   const treeRef = useRef()
   const [treeView, setTreeView] = useState(null) // useState 추가
 
-  const handleGrow = (score) => {
-    const c = count + 1
-    const t = total + score
-    scoreRef.current.score(score)
+  const handleGrow = (o) => {
+    const { s, t, c } = o
+    scoreRef.current.score(s)
     treeRef.current.generating(t, c, 1)
     setCount(c)
     setTotal(t)
   }
 
-  const handleInit = () => {
-    const {t,c} = {t:800, c:60}
+  const handleInit = (o) => {
+    console.trace()
+    const { t, c } = o
     treeRef.current.init(t, c)
     setCount(c)
     setTotal(t)
@@ -45,9 +45,8 @@ export default function Page() {
           <LSystemInstanced ref={treeRef} />
         </Tree>
         <Background />
-        <Guide />
         <Common color={'#EFEFED'} />
-      </View>
+      </View>,
     )
   }, []) // useEffect에서 treeView 상태를 설정
 
@@ -55,21 +54,22 @@ export default function Page() {
     <>
       <Leva hidden={true} />
       <div className={'fixed w-24 h-16 bottom-40 right-0 bg-amber-300 z-40'}>
-        <button onClick={()=>handleGrow(5)} className={'w-full h-full'}>
+        <button onClick={() => handleGrow({ s: 5, t: total+5, c: count+1 })} className={'w-full h-full'}>
           GROW + 5
         </button>
       </div>
 
       <div className={'fixed w-24 h-16 bottom-16 right-0 bg-amber-300 z-40'}>
-        <button onClick={()=>handleInit()} className={'w-full h-full'}>
+        <button onClick={() => handleInit({ t: 0, c: 1 })} className={'w-full h-full'}>
+          INIT + 0
+        </button>
+      </div>
+
+      <div className={'fixed w-24 h-16 bottom-16 left-0 bg-amber-300 z-40'}>
+        <button onClick={() => handleInit({ t: 800, c: 100 })} className={'w-full h-full'}>
           INIT + 800
         </button>
       </div>
-      {/*<div className={'fixed w-24 h-16 bottom-16 left-0 bg-amber-300 z-40'}>*/}
-      {/*  <button onClick={handleInit} className={'w-full h-full'}>*/}
-      {/*    INIT*/}
-      {/*  </button>*/}
-      {/*</div>*/}
       <Cover />
       <Score ref={scoreRef} />
       {treeView}

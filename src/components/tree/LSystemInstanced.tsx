@@ -285,7 +285,7 @@ const LSystemInstanced = forwardRef((props, ref) => {
     const r = Math.random()
     if ( currentObject.type==="leaf" && r < 0.03 && totalPoint > conditionPoints[0]) {
       const reward = getRewardIndex(totalPoint, conditionPoints, conditionRewards, false)
-      console.log('%c r: %s, reward: %o', 'color:red;', r, reward)
+      // console.log('%c r: %s, reward: %o', 'color:red;', r, reward)
       if (reward.type === 'fruit') {
         // 🍏🍏🍏 fruit 🍏🍏🍏
         length = randomRange(minPetalLength, maxPetalLength)
