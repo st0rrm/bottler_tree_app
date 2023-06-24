@@ -6,15 +6,6 @@ import { useThreeHelper } from '@/components/tree/ThreeHelper'
 import { useTexture } from '@react-three/drei'
 import { gsap } from 'gsap'
 
-type Item = {
-  id: string
-  object: Object3D
-  complete: boolean
-}
-
-
-
-
 const TreeInstances = forwardRef((props, ref) => {
   const { count, path, width, height, type, onLoaded } = props
   const texture = useTexture(path, onLoaded)
@@ -146,13 +137,14 @@ const TreeInstances = forwardRef((props, ref) => {
     if (meshRef.current) {
       // Set positions
       for (let i = 0; i < count; i++) {
-        temp.position.set(0, -1, 0)
+        temp.position.set(0, -2, 0)
         temp.scale.set(ratio, ratio, ratio)
         temp.updateMatrix()
         meshRef.current.setMatrixAt(i, temp.matrix)
       }
       // Update the instance
       meshRef.current.instanceMatrix.needsUpdate = true
+      console.log('%cTreeInstances: %o', 'color:blue', meshRef.current.instanceMatrix)
     }
 
     if (geometryRef.current) {

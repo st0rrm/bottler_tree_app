@@ -75,7 +75,7 @@ const LSystemInstanced = forwardRef((props, ref) => {
   const lengthScale = 0.75
   const widthScale = 0.93
   const randomRotations = randomArea(1000)
-  const conditionPoints = [50, 150, 250, 350, 450, 500, 600, 700, 800, 900, 1000]
+  const conditionPoints = [30, 100, 300, 500, 1000, 1200, 1400, 1600, 1800, 2000, 2200]
   const conditionRewards = [
     { type: 'flower', index: 0 },
     { type: 'flower', index: 1 },
