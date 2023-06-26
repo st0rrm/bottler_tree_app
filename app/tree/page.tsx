@@ -11,6 +11,7 @@ import useTreeStore from '@/stores/useTreeStore'
 import Background from '@/components/tree/Background'
 import Score from '@/components/tree/Score'
 import { SendToMobile, useMobileStatus } from '@/helpers/SendToMobile'
+import { db } from '@/components/tree/db'
 
 const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.View), { ssr: false })
 const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mod.Common), { ssr: false })
@@ -45,15 +46,33 @@ export default function Page() {
     }
   }, [isMobile])
 
+  const init = async (uid, total, count) => {
+    const saveTotal = await db.option.where({ uid:uid, key: "total" }).first()
+    const saveCount = await db.option.where({ uid:uid, key: "count" }).first()
+    if(saveTotal && saveCount) {
+      // load data from indexedDB
+      treeRef.current.load(uid)
+    } else {
+      // init data
+      treeRef.current.init(total, count)
+    }
+    setUid(uid)
+    setInitThree(true)
+  }
+
+  const grow = async (score, total, count) => {
+    scoreRef.current.score(score)
+    treeRef.current.generating(total, count, 1)
+  }
+
   const receiveMessage = (e:any)=>{
     try{
       const data = JSON.parse(e.data)
-      if(data.type === 'grow'){
-
-      }else if(data.type === 'init'){
-        setUid(data.uid)
-        setCount(data.count)
-        setTotal(data.total)
+      const { type, uid, total, count, score } = data
+      if(type === 'grow'){
+        if(score && total && count) grow(score, total, count)
+      }else if(type === 'init'){
+        if(uid && total && count) init(uid, total, count)
       }
     } catch (e) {
       //

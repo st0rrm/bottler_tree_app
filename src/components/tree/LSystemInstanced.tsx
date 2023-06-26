@@ -107,6 +107,8 @@ const LSystemInstanced = forwardRef((props, ref) => {
       animation = false
       totalPoint = total
       totalCount = count
+      setTotal(totalPoint)
+      setCount(totalCount)
       console.log('%c INIT:: total: %s, count: %s', 'color:black; background:yellow', total, count)
       for (let i = 0; i < count; i++) {
         currentPath = createPath(axiom, rules, iterations)
@@ -128,6 +130,8 @@ const LSystemInstanced = forwardRef((props, ref) => {
         currentPath = createPath(axiom, rules, iterations)
         build()
       }
+      setTotal(totalPoint)
+      setCount(totalCount)
     },
     save: (uid) => {
       //
