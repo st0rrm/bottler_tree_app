@@ -108,13 +108,13 @@ export default function Page() {
       </div>
 
       <div className={'fixed w-24 h-16 bottom-16 right-0 bg-amber-300 z-40'}>
-        <button onClick={() => handleInit({ uid: "d", total: 0, count: 1, score: 0 })} className={'w-full h-full'}>
+        <button onClick={() => handleInit({ uid: "bbbb", total: 0, count: 1, score: 0 })} className={'w-full h-full'}>
           INIT + 0
         </button>
       </div>
 
       <div className={'fixed w-24 h-16 bottom-16 left-0 bg-amber-300 z-40'}>
-        <button onClick={() => handleInit({ uid: "h", total: 800, count: 100, score: 0 })} className={'w-full h-full'}>
+        <button onClick={() => handleInit({ uid: "bbbb", total: 800, count: 100, score: 0 })} className={'w-full h-full'}>
           INIT + 800
         </button>
       </div>

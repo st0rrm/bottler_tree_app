@@ -97,7 +97,7 @@ const LSystemInstanced = forwardRef((props, ref) => {
   const flowerRef = useRef()
   const fruitRef = useRef()
   const { getPos, randomRangeInt, randomRange, randomDirection } = useThreeHelper()
-  const { uid, loadedTexture } = useTreeStore()
+  const { uid, loadedTexture, setTotal, setCount } = useTreeStore()
   const [pool, setPool] = useState(null)
   //
   //hooks
@@ -130,18 +130,47 @@ const LSystemInstanced = forwardRef((props, ref) => {
       }
     },
     save: (uid) => {
+      //
+      saveOption(uid)
+      //
       branchRef.current.save(uid)
       leafRef.current.save(uid)
       flowerRef.current.save(uid)
       fruitRef.current.save(uid)
     },
     load: (uid) => {
+      //
+      loadOption(uid)
+      //
       branchRef.current.load(uid)
       leafRef.current.load(uid)
       flowerRef.current.load(uid)
       fruitRef.current.load(uid)
     }
   }))
+  //
+  const saveOption = async (uid) => {
+    const saveTotal = await db.option.where({ uid:uid, key: "total" }).first()
+    if(saveTotal) {
+      await db.option.update(saveTotal.id, { value: totalPoint })
+    } else {
+      await db.option.add({ uid:uid, key: "total", value: totalPoint })
+    }
+    const saveCount = await db.option.where({ uid:uid, key: "count" }).first()
+    if(saveCount) {
+      await db.option.update(saveCount.id, { value: totalCount })
+    } else {
+      await db.option.add({ uid:uid, key: "count", value: totalCount })
+    }
+  }
+  const loadOption = async (uid) => {
+    const saveTotal = await db.option.where({ uid:uid, key: "total" }).first()
+    const saveCount = await db.option.where({ uid:uid, key: "count" }).first()
+    totalPoint = saveTotal.value
+    totalCount = saveCount.value
+    setTotal(totalPoint)
+    setCount(totalCount)
+  }
   //
   useEffect(() => {
     width = getPos(1)

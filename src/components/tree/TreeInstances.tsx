@@ -106,11 +106,8 @@ const TreeInstances = forwardRef((props, ref) => {
     load: async (uid) => {
       const data = await db.tree.where({ uid: uid, path: path }).first()
       if (data) {
-        console.log('%cdata: %o', 'color:blue', data)
         meshRef.current.instanceMatrix.copy(data.matrix)
         meshRef.current.instanceMatrix.needsUpdate = true
-      } else {
-
       }
     },
     setNextMesh: (position: Vector3, quaternion: Quaternion, scale: Vector3, delay: number, animation: true) => {
