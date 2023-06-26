@@ -5,9 +5,10 @@ import { Matrix4, Object3D, Quaternion, Vector3 } from 'three'
 import { useThreeHelper } from '@/components/tree/ThreeHelper'
 import { useTexture } from '@react-three/drei'
 import { gsap } from 'gsap'
+import { db } from '@/components/tree/db'
 
 const TreeInstances = forwardRef((props, ref) => {
-  const { count, path, width, height, type, onLoaded } = props
+  const { count, path, width, height, type, onLoaded, onGrow } = props
   const texture = useTexture(path, onLoaded)
   const { ratio } = useThreeHelper()
   const meshRef = useRef()
@@ -30,7 +31,7 @@ const TreeInstances = forwardRef((props, ref) => {
 
   const animateAndShrink = (existingDummy, duration, calculateY) => {
     const existingObject = existingDummy.object;
-
+    const id = pool.indexOf(existingDummy);
     gsap.to(existingObject.position, {
       x: existingObject.position.x,
       y: calculateY(existingObject.position.y),
@@ -39,7 +40,7 @@ const TreeInstances = forwardRef((props, ref) => {
       ease: 'power1.in',
       onUpdate: () => {
         existingObject.updateMatrix();
-        meshRef.current.setMatrixAt(pool.indexOf(existingDummy), existingObject.matrix);
+        meshRef.current.setMatrixAt(pool[id], existingObject.matrix);
         meshRef.current.instanceMatrix.needsUpdate = true;
       },
     });
@@ -52,9 +53,12 @@ const TreeInstances = forwardRef((props, ref) => {
       ease: 'power1.in',
       onUpdate: () => {
         existingObject.updateMatrix();
-        meshRef.current.setMatrixAt(pool.indexOf(existingDummy), existingObject.matrix);
+        meshRef.current.setMatrixAt(pool[id], existingObject.matrix);
         meshRef.current.instanceMatrix.needsUpdate = true;
-      }
+      },
+      onComplete: () => {
+        handleComplete(id)
+      },
     });
   }
 
@@ -72,7 +76,43 @@ const TreeInstances = forwardRef((props, ref) => {
     }
   }
 
+  const handleComplete = (id) => {
+    if (pool[id]) {
+      pool[id].complete = true
+      onGrow(path, pool, meshRef.current.instanceMatrix)
+    }
+  }
+
   useImperativeHandle(ref, () => ({
+    save: async (uid) => {
+      const data = await db.tree.where({ uid: uid, path: path }).first()
+      console.log('%cdata: %o', 'color:blue', data)
+      if (data) {
+        db.tree.update(data.id, {
+          // pool: pool,
+          matrix: meshRef.current.instanceMatrix,
+          count: pool.length,
+        })
+      } else {
+        db.tree.add({
+          uid: uid,
+          path: path,
+          // pool: pool,
+          matrix: meshRef.current.instanceMatrix,
+          count: pool.length,
+        })
+      }
+    },
+    load: async (uid) => {
+      const data = await db.tree.where({ uid: uid, path: path }).first()
+      if (data) {
+        console.log('%cdata: %o', 'color:blue', data)
+        meshRef.current.instanceMatrix.copy(data.matrix)
+        meshRef.current.instanceMatrix.needsUpdate = true
+      } else {
+
+      }
+    },
     setNextMesh: (position: Vector3, quaternion: Quaternion, scale: Vector3, delay: number, animation: true) => {
       const id = pool.length
       const obj = new Object3D()
@@ -110,25 +150,22 @@ const TreeInstances = forwardRef((props, ref) => {
               }
             },
             onComplete: () => {
-              if (pool[id]) {
-                testCollision(pool[id].object)
-                pool[id].complete = true
-              }
+              if(!pool[id]) return
+              testCollision(pool[id].object)
+              handleComplete(id)
             },
           },
         )
       } else {
-        if (pool[id]) {
-          pool[id].object.position.copy(position)
-          pool[id].object.quaternion.copy(quaternion)
-          pool[id].object.scale.copy(scale)
-          pool[id].object.updateMatrix()
-          meshRef.current.setMatrixAt(id, pool[id].object.matrix)
-          meshRef.current.instanceMatrix.needsUpdate = true
-
-          testCollision(pool[id].object)
-          pool[id].complete = true
-        }
+        if (!pool[id]) return
+        pool[id].object.position.copy(position)
+        pool[id].object.quaternion.copy(quaternion)
+        pool[id].object.scale.copy(scale)
+        pool[id].object.updateMatrix()
+        meshRef.current.setMatrixAt(id, pool[id].object.matrix)
+        meshRef.current.instanceMatrix.needsUpdate = true
+        testCollision(pool[id].object)
+        handleComplete(id)
       }
     },
   }))
@@ -144,7 +181,7 @@ const TreeInstances = forwardRef((props, ref) => {
       }
       // Update the instance
       meshRef.current.instanceMatrix.needsUpdate = true
-      console.log('%cTreeInstances: %o', 'color:blue', meshRef.current.instanceMatrix)
+      // console.log('%cTreeInstances: %o', 'color:blue', meshRef.current.instanceMatrix)
     }
 
     if (geometryRef.current) {

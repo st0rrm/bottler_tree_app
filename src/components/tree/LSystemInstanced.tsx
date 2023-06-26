@@ -1,11 +1,12 @@
 //@ts-nocheck
 
-import React, { forwardRef, Suspense, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { useThreeHelper } from '@/components/tree/ThreeHelper'
 import { Euler, MathUtils, Object3D, Quaternion, Vector3 } from 'three'
 import TreeInstancesPool from '@/components/tree/TreeInstancesPool'
 import { branchImages, flowerImages, fruitImages, leafImages } from '@/components/tree/resources'
 import useTreeStore from '@/stores/useTreeStore'
+import { db } from '@/components/tree/db'
 
 type meta = {
   type: string | null
@@ -96,7 +97,7 @@ const LSystemInstanced = forwardRef((props, ref) => {
   const flowerRef = useRef()
   const fruitRef = useRef()
   const { getPos, randomRangeInt, randomRange, randomDirection } = useThreeHelper()
-  const { loadedTexture } = useTreeStore()
+  const { uid, loadedTexture } = useTreeStore()
   const [pool, setPool] = useState(null)
   //
   //hooks
@@ -116,12 +117,30 @@ const LSystemInstanced = forwardRef((props, ref) => {
       animation = true
       totalPoint = total
       totalCount = count
-      console.log('%c GENERATING:: total: %s, count: %s, generate: %s', 'color:yellow; background:black', total, count, generate)
+      console.log(
+        '%c GENERATING:: total: %s, count: %s, generate: %s',
+        'color:yellow; background:black',
+        total,
+        count,
+        generate,
+      )
       for (let i = 0; i < generate; i++) {
         currentPath = createPath(axiom, rules, iterations)
         build()
       }
     },
+    save: (uid) => {
+      branchRef.current.save(uid)
+      leafRef.current.save(uid)
+      flowerRef.current.save(uid)
+      fruitRef.current.save(uid)
+    },
+    load: (uid) => {
+      branchRef.current.load(uid)
+      leafRef.current.load(uid)
+      flowerRef.current.load(uid)
+      fruitRef.current.load(uid)
+    }
   }))
   //
   useEffect(() => {
@@ -135,10 +154,10 @@ const LSystemInstanced = forwardRef((props, ref) => {
   useEffect(() => {
     setPool(
       <group>
-        <TreeInstancesPool ref={branchRef} datas={branchImages} count={1000} onLoaded={onLoaded} />
-        <TreeInstancesPool ref={leafRef} datas={leafImages} count={1000} onLoaded={onLoaded} />
-        <TreeInstancesPool ref={flowerRef} datas={flowerImages} count={100} onLoaded={onLoaded} />
-        <TreeInstancesPool ref={fruitRef} datas={fruitImages} count={100} onLoaded={onLoaded} />
+        <TreeInstancesPool ref={branchRef} datas={branchImages} count={1000} onLoaded={onLoaded} onGrow={onGrow} />
+        <TreeInstancesPool ref={leafRef} datas={leafImages} count={1000} onLoaded={onLoaded} onGrow={onGrow} />
+        <TreeInstancesPool ref={flowerRef} datas={flowerImages} count={100} onLoaded={onLoaded} onGrow={onGrow} />
+        <TreeInstancesPool ref={fruitRef} datas={fruitImages} count={100} onLoaded={onLoaded} onGrow={onGrow} />
       </group>,
     )
   }, [])
@@ -230,14 +249,14 @@ const LSystemInstanced = forwardRef((props, ref) => {
       // The repetition factor determines how many times each index is added to rewardIndices.
       // If isAscending is true, then higher indices will be repeated more.
       // If isAscending is false, then lower indices will be repeated more.
-      let repetitionFactor = isAscending ? i + 1 : points.length - i;
+      let repetitionFactor = isAscending ? i + 1 : points.length - i
       for (let j = 0; j < repetitionFactor; j++) {
-        rewardIndices.push(i);
+        rewardIndices.push(i)
       }
     }
 
-    let randomIndex = randomRangeInt(0, rewardIndices.length - 1);
-    return rewards[rewardIndices[randomIndex]];
+    let randomIndex = randomRangeInt(0, rewardIndices.length - 1)
+    return rewards[rewardIndices[randomIndex]]
   }
 
   const buildForward = (i) => {
@@ -283,7 +302,7 @@ const LSystemInstanced = forwardRef((props, ref) => {
 
     // Reward
     const r = Math.random()
-    if ( currentObject.type==="leaf" && r < 0.03 && totalPoint > conditionPoints[0]) {
+    if (currentObject.type === 'leaf' && r < 0.03 && totalPoint > conditionPoints[0]) {
       const reward = getRewardIndex(totalPoint, conditionPoints, conditionRewards, false)
       // console.log('%c r: %s, reward: %o', 'color:red;', r, reward)
       if (reward.type === 'fruit') {
@@ -345,6 +364,8 @@ const LSystemInstanced = forwardRef((props, ref) => {
   const onLoaded = (e) => {
     loadedTexture()
   }
+
+  const onGrow = (path, pool, matrix) => {}
 
   return <group {...props}>{pool}</group>
 })

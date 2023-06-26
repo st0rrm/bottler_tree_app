@@ -4,6 +4,8 @@ import {create} from "zustand";
 import { branchImages, flowerImages, fruitImages, leafImages } from '@/components/tree/resources'
 
 const useTreeStore = create((set, get) => ({
+  uid: null,
+  setUid: (t: string) => set({uid: t}),
   total: 0,
   setTotal: (t: number) => set({total: t}),
   count: 0,
