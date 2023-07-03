@@ -2,7 +2,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, lazy, Suspense } from 'react'
 import Tree from '@/components/tree/Tree'
 import { LSystemInstanced } from '@/components/tree/LSystemInstanced'
 import Cover from '@/components/tree/Cover'
@@ -12,6 +12,7 @@ import Background from '@/components/tree/Background'
 import Score from '@/components/tree/Score'
 import { SendToMobile, useMobileStatus } from '@/helpers/SendToMobile'
 import { db } from '@/components/tree/db'
+
 
 const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.View), { ssr: false })
 const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mod.Common), { ssr: false })
@@ -34,6 +35,17 @@ export default function Page() {
   useEffect(() => {
     document.addEventListener("message", receiveMessage);
     window.addEventListener("message", receiveMessage);
+
+    setTreeView(
+      <View debug={false} className='absolute top-0 flex h-screen w-full flex-col items-center justify-center' orbit>
+        <Tree>
+          <LSystemInstanced ref={treeRef} />
+        </Tree>
+        <Background />
+        <Common color={'#EFEFED'} />
+      </View>
+    )
+
     return () => {
       document.removeEventListener("message", receiveMessage);
       window.removeEventListener("message", receiveMessage);
@@ -41,12 +53,14 @@ export default function Page() {
   }, [])
 
   useEffect(() => {
-    if (isMobile) {
+    if(treeRef.current){
       SendToMobile("COMMAND", "hello");
     }
-  }, [isMobile])
+  }, [treeRef.current])
 
   const init = async (uid, total, count) => {
+
+    // alert("03. ------- ", db)
     const saveTotal = await db.option.where({ uid:uid, key: "total" }).first()
     const saveCount = await db.option.where({ uid:uid, key: "count" }).first()
     if(saveTotal && saveCount) {
@@ -56,8 +70,14 @@ export default function Page() {
       // init data
       treeRef.current.init(total, count)
     }
+
+    // treeRef.current.init(total, count)
+
     setUid(uid)
     setInitThree(true)
+    if (isMobile) {
+      SendToMobile("COMMAND", "init");
+    }
   }
 
   const grow = async (score, total, count) => {
@@ -70,9 +90,9 @@ export default function Page() {
       const data = JSON.parse(e.data)
       const { type, uid, total, count, score } = data
       if(type === 'grow'){
-        if(score && total && count) grow(score, total, count)
+        if(treeRef.current && score && total && count) grow(score, total, count)
       }else if(type === 'init'){
-        if(uid && total && count) init(uid, total, count)
+        if(treeRef.current && uid && total && count) init(uid, total, count)
       }
     } catch (e) {
       //
@@ -104,22 +124,8 @@ export default function Page() {
     treeRef.current.load(uid)
   }
 
-
-  useEffect(() => {
-    setTreeView(
-      <View debug={true} className='absolute top-0 flex h-screen w-full flex-col items-center justify-center' orbit>
-        <Tree>
-          <LSystemInstanced ref={treeRef} />
-        </Tree>
-        <Background />
-        <Common color={'#EFEFED'} />
-      </View>,
-    )
-  }, []) // useEffect에서 treeView 상태를 설정
-
-  return (
+  const Buttons = () => {
     <>
-      <Leva hidden={true} />
       <div className={'fixed w-24 h-16 bottom-40 right-0 bg-amber-300 z-40'}>
         <button onClick={() => handleGrow({ uid: "a", score: 5, total: total+5, count: count+1 })} className={'w-full h-full'}>
           GROW + 5
@@ -149,7 +155,12 @@ export default function Page() {
           LOAD
         </button>
       </div>
+    </>
+  }
 
+  return (
+    <>
+      <Leva hidden={true} />
       <Cover />
       <Score ref={scoreRef} />
       {treeView}
