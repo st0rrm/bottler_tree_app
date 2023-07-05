@@ -6,7 +6,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import Tree from '@/components/tree/Tree'
 import { LSystemInstanced } from '@/components/tree/LSystemInstanced'
 import Cover from '@/components/tree/Cover'
-import { Leva } from 'leva'
 import useTreeStore from '@/stores/useTreeStore'
 import Background from '@/components/tree/Background'
 import Score from '@/components/tree/Score'
@@ -168,10 +167,14 @@ export default function Page() {
 
   return (
     <>
-      <Leva hidden={true} />
+      <div className="flex justify-center items-center h-screen">
+        <div className="w-12 h-12 bg-yellow-500">LOADING...</div>
+      </div>
+
       <Cover />
-      <Score ref={scoreRef} />
+      {/*<Score ref={scoreRef} />*/}
       {treeView}
+
     </>
   )
 }

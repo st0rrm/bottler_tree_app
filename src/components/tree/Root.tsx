@@ -4,14 +4,13 @@ import React from 'react'
 import { Plane, useTexture } from '@react-three/drei'
 import { branchImages } from '@/components/tree/resources'
 import { useThreeHelper } from '@/components/tree/ThreeHelper'
-import { useControls } from 'leva'
 
 const Root = () => {
-  const { rootShow, hillShow } = useControls({ rootShow: true, hillShow: true })
+  const { rootShow, hillShow } = { rootShow: true, hillShow: true }
   const branch = branchImages[0]
   const textureRoot = useTexture(branch.path)
   const hill = {
-    path: './assets/front_hills_new.png',
+    path: '././assets/front_hills_new.png',
     width: 1100,
     height: 204,
   }

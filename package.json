@@ -1,8 +1,8 @@
 {
-  "name": "react-three-next",
-  "version": "2.0.0",
+  "name": "bottleclub-tree",
+  "version": "23.27",
   "authors": [
-    "Renaud ROHLINGER <https://twitter.com/onirenaud>"
+    "BIEN P.R. <https://bien.ltd>"
   ],
   "license": "MIT",
   "private": true,
@@ -18,7 +18,6 @@
     "gasp": "^0.0.2",
     "glsl-random": "^0.0.5",
     "gsap": "^3.12.1",
-    "leva": "^0.9.35",
     "next": "^13.4.2",
     "r3f-perf": "^7.1.2",
     "random-seed": "^0.3.0",

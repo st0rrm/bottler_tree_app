@@ -3,9 +3,9 @@
 import React from 'react'
 import { Box, Plane, Sphere, useTexture } from '@react-three/drei'
 import { useThreeHelper } from '@/components/tree/ThreeHelper'
-import { useControls } from 'leva'
+
 const Guide = () => {
-  const { guideShow } = useControls({guideShow:false})
+  const { guideShow } = {guideShow:false}
   const guide = {
     path: "./assets/guide.png",
     width: 390,

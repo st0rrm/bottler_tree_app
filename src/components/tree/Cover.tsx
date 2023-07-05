@@ -23,7 +23,7 @@ const Cover = () => {
 
   // CSS transitions
   const styles = {
-    transition: 'opacity 1s',
+    transition: 'opacity 0.3s',
     opacity: close ? 0 : 1
   };
 
