@@ -6,7 +6,7 @@ import { branchImages } from '@/components/tree/resources'
 import { useThreeHelper } from '@/components/tree/ThreeHelper'
 
 const Root = () => {
-  const { rootShow, hillShow } = { rootShow: true, hillShow: true }
+  const { rootShow, hillShow } = { rootShow: true, hillShow: false }
   const branch = branchImages[0]
   const textureRoot = useTexture(branch.path)
   const hill = {
