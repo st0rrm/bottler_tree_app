@@ -15,6 +15,7 @@ const TreeInstances = forwardRef((props, ref) => {
   const geometryRef = useRef()
   const temp = new Object3D()
   const pool = []
+  let poolCount = 0
 
   const typeConfigs = {
     'leaf': {
@@ -40,7 +41,7 @@ const TreeInstances = forwardRef((props, ref) => {
       ease: 'power1.in',
       onUpdate: () => {
         existingObject.updateMatrix();
-        meshRef.current.setMatrixAt(pool[id], existingObject.matrix);
+        meshRef.current.setMatrixAt(id, existingObject.matrix);
         meshRef.current.instanceMatrix.needsUpdate = true;
       },
     });
@@ -53,7 +54,7 @@ const TreeInstances = forwardRef((props, ref) => {
       ease: 'power1.in',
       onUpdate: () => {
         existingObject.updateMatrix();
-        meshRef.current.setMatrixAt(pool[id], existingObject.matrix);
+        meshRef.current.setMatrixAt(id, existingObject.matrix);
         meshRef.current.instanceMatrix.needsUpdate = true;
       },
       onComplete: () => {
@@ -64,10 +65,10 @@ const TreeInstances = forwardRef((props, ref) => {
 
   const testCollision = (obj) => {
     for (const existingDummy of pool) {
-      if (existingDummy.complete && (type === "leaf" || type === "flower")) {
+      if (existingDummy && existingDummy.complete && (type === "leaf" || type === "flower")) {
         const typeConfig = typeConfigs[type];
         const dist = existingDummy.object.position.distanceTo(obj.position);
-
+        console.log('dist: ', dist)
         if (dist < typeConfig.distanceThreshold) {
           animateAndShrink(existingDummy, typeConfig.duration, typeConfig.calculateY);
           break;
@@ -85,13 +86,14 @@ const TreeInstances = forwardRef((props, ref) => {
 
   useImperativeHandle(ref, () => ({
     save: async (uid) => {
+      // console.log('%cpath: %o', 'color:blue', path)
       const data = await db.tree.where({ uid: uid, path: path }).first()
-      console.log('%cdata: %o', 'color:blue', data)
+      // console.log('%cdata: %o', 'color:blue', data)
       if (data) {
         db.tree.update(data.id, {
           // pool: pool,
           matrix: meshRef.current.instanceMatrix,
-          count: pool.length,
+          poolCount: poolCount,
         })
       } else {
         db.tree.add({
@@ -99,7 +101,7 @@ const TreeInstances = forwardRef((props, ref) => {
           path: path,
           // pool: pool,
           matrix: meshRef.current.instanceMatrix,
-          count: pool.length,
+          poolCount: poolCount,
         })
       }
     },
@@ -108,10 +110,12 @@ const TreeInstances = forwardRef((props, ref) => {
       if (data) {
         meshRef.current.instanceMatrix.copy(data.matrix)
         meshRef.current.instanceMatrix.needsUpdate = true
+        poolCount = data.poolCount
       }
     },
     setNextMesh: (position: Vector3, quaternion: Quaternion, scale: Vector3, delay: number, animation: true) => {
-      const id = pool.length
+      const id = poolCount
+      poolCount++
       const obj = new Object3D()
       obj.position.copy(position)
       obj.quaternion.copy(quaternion)
@@ -137,7 +141,7 @@ const TreeInstances = forwardRef((props, ref) => {
             y: scale.y,
             z: scale.z,
             delay: delay,
-            duration: 1,
+            duration: 0.5,
             ease: 'power1.out',
             onUpdate: () => {
               if (pool[id]) {

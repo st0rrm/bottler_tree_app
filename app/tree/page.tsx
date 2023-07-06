@@ -66,6 +66,7 @@ export default function Page() {
     } else {
       // init data
       treeRef.current.init(total, count)
+      treeRef.current.save(uid)
     }
 
     // treeRef.current.init(total, count)
@@ -87,7 +88,7 @@ export default function Page() {
       const data = JSON.parse(e.data)
       const { type, uid, total, count, score } = data
       if (type === 'grow') {
-        if (treeRef.current && score && total > -1 && count) grow(score, total, count)
+        if (treeRef.current && score && total > -1) grow(score, total, count)
       } else if (type === 'init') {
         if (treeRef.current && uid && total > -1 && count) init(uid, total, count)
       } else if (type === 'save') {
@@ -126,10 +127,14 @@ export default function Page() {
   }
 
   const Buttons = () => {
-    ;<>
+    return (
+    <>
       <div className={'fixed w-24 h-16 bottom-40 right-0 bg-amber-300 z-40'}>
         <button
-          onClick={() => handleGrow({ uid: 'a', score: 5, total: total + 5, count: count + 1 })}
+          onClick={() => {
+            // handleGrow({ uid: 'a', score: 5, total: total + 5, count: count + 1 })
+            grow(5, 0, 0)
+          }}
           className={'w-full h-full'}
         >
           GROW + 5
@@ -137,14 +142,19 @@ export default function Page() {
       </div>
 
       <div className={'fixed w-24 h-16 bottom-16 right-0 bg-amber-300 z-40'}>
-        <button onClick={() => handleInit({ uid: 'bbbb', total: 0, count: 1, score: 0 })} className={'w-full h-full'}>
+        <button onClick={() => {
+          init('123123aaaaaaa', 0, 1)
+        }} className={'w-full h-full'}>
           INIT + 0
         </button>
       </div>
 
       <div className={'fixed w-24 h-16 bottom-16 left-0 bg-amber-300 z-40'}>
         <button
-          onClick={() => handleInit({ uid: 'bbbb', total: 800, count: 100, score: 0 })}
+          onClick={() => {
+            // handleInit({ uid: 'bbbb', total: 800, count: 100, score: 0 })
+            init('asdfasdf11', 800, 100)
+          }}
           className={'w-full h-full'}
         >
           INIT + 800
@@ -163,12 +173,14 @@ export default function Page() {
         </button>
       </div>
     </>
+    )
   }
 
   return (
     <>
+      {/*<Buttons />*/}
       <Cover />
-      <Score ref={scoreRef} />
+      <Score ref={scoreRef} onComplete={handleSave} />
       {treeView}
     </>
   )
