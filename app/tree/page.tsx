@@ -167,14 +167,9 @@ export default function Page() {
 
   return (
     <>
-      <div className="flex justify-center items-center h-screen">
-        <div className="w-12 h-12 bg-yellow-500">LOADING...</div>
-      </div>
-
       <Cover />
-      {/*<Score ref={scoreRef} />*/}
+      <Score ref={scoreRef} />
       {treeView}
-
     </>
   )
 }
