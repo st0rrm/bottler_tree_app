@@ -6,7 +6,7 @@ import Root from '@/components/tree/Root'
 import useTreeStore from '@/stores/useTreeStore'
 
 const Tree = ({children}) => {
-  const margin = 5
+  const margin = 2
   const { height } = useThree((state) => state.viewport)
   //
   return (

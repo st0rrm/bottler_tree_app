@@ -25,7 +25,7 @@ type Data = {
 
 export default function Page() {
   const { uid, total, count, setUid, setCount, setTotal, setInitThree } = useTreeStore()
-  const scoreRef = useRef()
+  // const scoreRef = useRef()
   const treeRef = useRef()
   const [treeView, setTreeView] = useState(null) // useState 추가
   const isMobile = useMobileStatus()
@@ -35,9 +35,9 @@ export default function Page() {
     window.addEventListener('message', receiveMessage)
 
     setTreeView(
-      <View debug={false} className='absolute top-0 flex h-screen w-full flex-col items-center justify-center' orbit>
+      <View debug={false} className='absolute top-0 flex h-screen w-full flex-col items-center justify-center' orbit={false}>
         <Tree>
-          <LSystemInstanced ref={treeRef} />
+          <LSystemInstanced ref={treeRef} position={[0, 0, 0.1]} />
         </Tree>
         <Background />
         <Common color={'#EFEFED'} />
@@ -79,7 +79,7 @@ export default function Page() {
   }
 
   const grow = async (score, total, count) => {
-    scoreRef.current.score(score)
+    // scoreRef.current.score(score)
     treeRef.current.generating(total, count, 1)
   }
 
@@ -103,7 +103,7 @@ export default function Page() {
 
   const handleGrow = (o) => {
     const { score, total, count } = o
-    scoreRef.current.score(score)
+    // scoreRef.current.score(score)
     treeRef.current.generating(total, count, 1)
     setCount(count)
     setTotal(total)
@@ -180,7 +180,7 @@ export default function Page() {
     <>
       {/*<Buttons />*/}
       <Cover />
-      <Score ref={scoreRef} onComplete={handleSave} />
+      {/*<Score ref={scoreRef} onComplete={handleSave} />*/}
       {treeView}
     </>
   )
