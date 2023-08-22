@@ -56,26 +56,26 @@ export default function Page() {
     }
   }, [treeRef.current])
 
-  const init = async (uid, total, count) => {
+  const init = async (uid, total, count, force=false) => {
     // alert("03. ------- ", db)
     const saveTotal = await db.option.where({ uid: uid, key: 'total' }).first()
     const saveCount = await db.option.where({ uid: uid, key: 'count' }).first()
-    if (saveTotal && saveCount) {
-      // load data from indexedDB
-      treeRef.current.load(uid)
+
+    const shouldInitialize = force || (!saveTotal && !saveCount);
+    if (shouldInitialize) {
+      treeRef.current.init(total, count);
     } else {
-      // init data
-      treeRef.current.init(total, count)
+      treeRef.current.load(uid);
+    }
+
+    setTimeout(() => {
       treeRef.current.save(uid)
-    }
-
-    // treeRef.current.init(total, count)
-
-    setUid(uid)
-    setInitThree(true)
-    if (isMobile) {
-      SendToMobile('COMMAND', 'init')
-    }
+      setUid(uid)
+      setInitThree(true)
+      if (isMobile) {
+        SendToMobile('COMMAND', 'init')
+      }
+    }, 250)
   }
 
   const grow = async (score, total, count) => {
@@ -86,11 +86,11 @@ export default function Page() {
   const receiveMessage = (e: any) => {
     try {
       const data = JSON.parse(e.data)
-      const { type, uid, total, count, score } = data
+      const { type, uid, total, count, score, force } = data
       if (type === 'grow') {
         if (treeRef.current && score && total > -1) grow(score, total, count)
       } else if (type === 'init') {
-        if (treeRef.current && uid && total > -1 && count) init(uid, total, count)
+        if (treeRef.current && uid && total > -1 && count) init(uid, total, count, force)
       } else if (type === 'save') {
         if (treeRef.current && uid) treeRef.current.save(uid)
       } else if (type === 'load') {
@@ -99,31 +99,6 @@ export default function Page() {
     } catch (e) {
       //
     }
-  }
-
-  const handleGrow = (o) => {
-    const { score, total, count } = o
-    // scoreRef.current.score(score)
-    treeRef.current.generating(total, count, 1)
-    setCount(count)
-    setTotal(total)
-  }
-
-  const handleInit = (o) => {
-    const { uid, total, count } = o
-    treeRef.current.init(total, count)
-    setUid(uid)
-    setCount(count)
-    setTotal(total)
-    setInitThree(true)
-  }
-
-  const handleSave = () => {
-    treeRef.current.save(uid)
-  }
-
-  const handleLoad = () => {
-    treeRef.current.load(uid)
   }
 
   const Buttons = () => {
@@ -178,7 +153,7 @@ export default function Page() {
 
   return (
     <>
-      {/*<Buttons />*/}
+      <Buttons />
       <Cover />
       {/*<Score ref={scoreRef} onComplete={handleSave} />*/}
       {treeView}
