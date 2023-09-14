@@ -11,6 +11,7 @@ import Background from '@/components/tree/Background'
 import Score from '@/components/tree/Score'
 import { SendToMobile, useMobileStatus } from '@/helpers/SendToMobile'
 import { db } from '@/components/tree/db'
+import Loading from '@/components/tree/Loading'
 
 const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.View), { ssr: false })
 const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mod.Common), { ssr: false })
@@ -24,7 +25,7 @@ type Data = {
 }
 
 export default function Page() {
-  const { uid, total, count, setUid, setCount, setTotal, setInitThree } = useTreeStore()
+  const { uid, total, count, initThree, setUid, setCount, setTotal, setInitThree } = useTreeStore()
   // const scoreRef = useRef()
   const treeRef = useRef()
   const [treeView, setTreeView] = useState(null) // useState 추가
@@ -104,7 +105,7 @@ export default function Page() {
   const Buttons = () => {
     return (
     <>
-      <div className={'fixed w-24 h-16 bottom-40 right-0 bg-amber-300 z-40'}>
+      <div className={'fixed w-24 h-16 bottom-40 right-0 bg-amber-300 z-50'}>
         <button
           onClick={() => {
             // handleGrow({ uid: 'a', score: 5, total: total + 5, count: count + 1 })
@@ -116,7 +117,7 @@ export default function Page() {
         </button>
       </div>
 
-      <div className={'fixed w-24 h-16 bottom-16 right-0 bg-amber-300 z-40'}>
+      <div className={'fixed w-24 h-16 bottom-16 right-0 bg-amber-300 z-50'}>
         <button onClick={() => {
           init('123123aaaaaaa', 0, 1)
         }} className={'w-full h-full'}>
@@ -124,7 +125,7 @@ export default function Page() {
         </button>
       </div>
 
-      <div className={'fixed w-24 h-16 bottom-16 left-0 bg-amber-300 z-40'}>
+      <div className={'fixed w-24 h-16 bottom-16 left-0 bg-amber-300 z-50'}>
         <button
           onClick={() => {
             // handleInit({ uid: 'bbbb', total: 800, count: 100, score: 0 })
@@ -136,13 +137,13 @@ export default function Page() {
         </button>
       </div>
 
-      <div className={'fixed w-24 h-16 bottom-40 left-0 bg-amber-300 z-40'}>
+      <div className={'fixed w-24 h-16 bottom-40 left-0 bg-amber-300 z-50'}>
         <button onClick={() => handleSave()} className={'w-full h-full'}>
           SAVE
         </button>
       </div>
 
-      <div className={'fixed w-24 h-16 bottom-64 left-0 bg-amber-300 z-40'}>
+      <div className={'fixed w-24 h-16 bottom-64 left-0 bg-amber-300 z-50'}>
         <button onClick={() => handleLoad()} className={'w-full h-full'}>
           LOAD
         </button>
@@ -153,10 +154,11 @@ export default function Page() {
 
   return (
     <>
-      <Buttons />
+      {/*<Buttons />*/}
       <Cover />
       {/*<Score ref={scoreRef} onComplete={handleSave} />*/}
       {treeView}
+      {initThree===false && <Loading />}
     </>
   )
 }

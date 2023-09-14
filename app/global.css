@@ -25,3 +25,21 @@
   src: url('/fonts/voster-typeface.woff2') format('woff2'),
     url('/fonts/voster-typeface.woff') format('woff');
 }
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border-top-color: #666;
+  animation: spin 1s infinite linear;
+}
