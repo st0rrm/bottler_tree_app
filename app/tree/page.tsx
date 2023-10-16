@@ -8,7 +8,6 @@ import { LSystemInstanced } from '@/components/tree/LSystemInstanced'
 import Cover from '@/components/tree/Cover'
 import useTreeStore from '@/stores/useTreeStore'
 import Background from '@/components/tree/Background'
-import Score from '@/components/tree/Score'
 import { SendToMobile, useMobileStatus } from '@/helpers/SendToMobile'
 import { db } from '@/components/tree/db'
 import Loading from '@/components/tree/Loading'
@@ -25,7 +24,7 @@ type Data = {
 }
 
 export default function Page() {
-  const { uid, total, count, initThree, setUid, setCount, setTotal, setInitThree } = useTreeStore()
+  const { initThree, setUid, setInitThree } = useTreeStore()
   // const scoreRef = useRef()
   const treeRef = useRef()
   const [treeView, setTreeView] = useState(null) // useState 추가
@@ -58,25 +57,39 @@ export default function Page() {
   }, [treeRef.current])
 
   const init = async (uid, total, count, force=false) => {
-    // alert("03. ------- ", db)
-    const saveTotal = await db.option.where({ uid: uid, key: 'total' }).first()
-    const saveCount = await db.option.where({ uid: uid, key: 'count' }).first()
 
-    const shouldInitialize = force || (!saveTotal && !saveCount);
-    if (shouldInitialize) {
-      treeRef.current.init(total, count);
-    } else {
-      treeRef.current.load(uid);
-    }
+    try{
+      // alert("03. ------- ", db)
+      const saveTotal = await db.option.where({ uid: uid, key: 'total' }).first()
+      const saveCount = await db.option.where({ uid: uid, key: 'count' }).first()
 
-    setTimeout(() => {
-      treeRef.current.save(uid)
-      setUid(uid)
-      setInitThree(true)
-      if (isMobile) {
-        SendToMobile('COMMAND', 'init')
+      const shouldInitialize = force || (!saveTotal && !saveCount);
+      if (shouldInitialize) {
+        treeRef.current.init(total, count);
+      } else {
+        treeRef.current.load(uid);
       }
-    }, 250)
+
+      setTimeout(() => {
+        treeRef.current.save(uid)
+        setUid(uid)
+        setInitThree(true)
+        if (isMobile) {
+          SendToMobile('COMMAND', 'init')
+        }
+      }, 250)
+    } catch (e) {
+      // 만약 실패 시 강제 생성
+      treeRef.current.init(total, count);
+      setTimeout(() => {
+        treeRef.current.save(uid)
+        setUid(uid)
+        setInitThree(true)
+        if (isMobile) {
+          SendToMobile('COMMAND', 'init')
+        }
+      }, 250)
+    }
   }
 
   const grow = async (score, total, count) => {
