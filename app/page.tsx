@@ -12,6 +12,7 @@ import { SendToMobile, useMobileStatus } from '@/helpers/SendToMobile'
 import { db } from '@/components/tree/db'
 import Loading from '@/components/tree/Loading'
 
+
 const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.View), { ssr: false })
 const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mod.Common), { ssr: false })
 
@@ -29,6 +30,7 @@ export default function Page() {
   const treeRef = useRef()
   const [treeView, setTreeView] = useState(null) // useState 추가
   const isMobile = useMobileStatus()
+  const [message, setMessage] = useState("나무 심는 중")
 
   useEffect(() => {
     document.addEventListener('message', receiveMessage)
@@ -52,6 +54,8 @@ export default function Page() {
 
   useEffect(() => {
     if (treeRef.current) {
+      console.log("threejs inited.")
+      setMessage("물 주는 중")
       SendToMobile('COMMAND', 'hello')
     }
   }, [treeRef.current])
@@ -71,23 +75,24 @@ export default function Page() {
       }
 
       setTimeout(() => {
-        treeRef.current.save(uid)
+
         setUid(uid)
         setInitThree(true)
         if (isMobile) {
           SendToMobile('COMMAND', 'init')
         }
+        treeRef.current.save(uid)
       }, 250)
     } catch (e) {
       // 만약 실패 시 강제 생성
       treeRef.current.init(total, count);
       setTimeout(() => {
-        treeRef.current.save(uid)
         setUid(uid)
         setInitThree(true)
         if (isMobile) {
           SendToMobile('COMMAND', 'init')
         }
+        treeRef.current.save(uid)
       }, 250)
     }
   }
@@ -171,7 +176,7 @@ export default function Page() {
       <Cover />
       {/*<Score ref={scoreRef} onComplete={handleSave} />*/}
       {treeView}
-      {initThree===false && <Loading />}
+      {initThree===false && <Loading msg={message} />}
     </>
   )
 }
