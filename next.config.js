@@ -12,6 +12,7 @@ const withPWA = require('@ducanh2912/next-pwa').default({
 })
 
 const nextConfig = {
+  output: 'export', // export static html files - 앱에서 바로 사용할 수 있도록 html 파일로 빌드
   // uncomment the following snippet if using styled components
   // compiler: {
   //   styledComponents: true,
