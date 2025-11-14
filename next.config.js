@@ -12,7 +12,7 @@ const withPWA = require('@ducanh2912/next-pwa').default({
 })
 
 const nextConfig = {
-  output: 'export', // 개발 모드에서는 주석 처리. 프로덕션 빌드 시에만 활성화
+  output: 'export',
   // uncomment the following snippet if using styled components
   // compiler: {
   //   styledComponents: true,
@@ -22,36 +22,6 @@ const nextConfig = {
     appDir: true,
   },
   images: {},
-  // iframe 임베딩을 위한 헤더 설정
-  async headers() {
-    return [
-      {
-        source: '/:path*',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'ALLOWALL',
-          },
-          {
-            key: 'Access-Control-Allow-Origin',
-            value: '*',
-          },
-          {
-            key: 'Access-Control-Allow-Methods',
-            value: 'GET, POST, OPTIONS',
-          },
-          {
-            key: 'Cross-Origin-Resource-Policy',
-            value: 'cross-origin',
-          },
-          {
-            key: 'Cross-Origin-Embedder-Policy',
-            value: 'require-corp',
-          },
-        ],
-      },
-    ]
-  },
   webpack(config, { isServer }) {
     // audio support
     config.module.rules.push({
