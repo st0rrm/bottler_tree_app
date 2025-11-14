@@ -16,7 +16,7 @@ import { Perf } from 'r3f-perf'
 export const Common = ({ color }) => {
   return (
     <Suspense fallback={null}>
-      <color attach='background' args={[color]} />
+      {color && color !== 'transparent' && <color attach='background' args={[color]} />}
       {/*<Grid cellColor='white' args={[10, 10]} rotation={[Math.PI / 2, 0, 0]} position={[0, 0, -0.1]} infiniteGrid />*/}
       <OrthographicCamera makeDefault position={[0, 0, 10]} zoom={20} />
     </Suspense>

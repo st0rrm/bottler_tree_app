@@ -8,7 +8,13 @@ import { r3f } from '@/helpers/global'
 export default function Scene({ ...props }) {
   // Everything defined in here will persist between route changes, only children are swapped
   return (
-    <Canvas {...props}>
+    <Canvas
+      {...props}
+      gl={{
+        alpha: true,
+        premultipliedAlpha: false
+      }}
+    >
       {/* @ts-ignore */}
       <r3f.Out />
       <Preload all />

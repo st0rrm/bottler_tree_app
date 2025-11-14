@@ -31,26 +31,35 @@ export default function Page() {
   const [treeView, setTreeView] = useState(null) // useState 추가
   const isMobile = useMobileStatus()
   const [message, setMessage] = useState("나무 심는 중")
+  const [showBackground, setShowBackground] = useState(true) // 배경 표시 여부
 
   useEffect(() => {
+    // URL 파라미터 체크 - noBackground=true이면 배경 제거
+    const params = new URLSearchParams(window.location.search)
+    const noBackground = params.get('noBackground') === 'true'
+    setShowBackground(!noBackground)
+
     document.addEventListener('message', receiveMessage)
     window.addEventListener('message', receiveMessage)
-
-    setTreeView(
-      <View debug={false} className='absolute top-0 flex h-screen w-full flex-col items-center justify-center' orbit={false}>
-        <Tree>
-          <LSystemInstanced ref={treeRef} position={[0, 0, 0.1]} />
-        </Tree>
-        <Background />
-        <Common color={'#EFEFED'} />
-      </View>,
-    )
 
     return () => {
       document.removeEventListener('message', receiveMessage)
       window.removeEventListener('message', receiveMessage)
     }
   }, [])
+
+  useEffect(() => {
+    // showBackground 상태에 따라 treeView 업데이트
+    setTreeView(
+      <View debug={false} className='absolute top-0 flex h-screen w-full flex-col items-center justify-center' orbit={false}>
+        <Tree>
+          <LSystemInstanced ref={treeRef} position={[0, 0, 0.1]} />
+        </Tree>
+        {showBackground && <Background />}
+        <Common color={showBackground ? '#EFEFED' : 'transparent'} />
+      </View>,
+    )
+  }, [showBackground])
 
   useEffect(() => {
     if (treeRef.current) {
