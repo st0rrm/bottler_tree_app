@@ -23,11 +23,11 @@ export const useThreeHelper = () => {
   useEffect(() => {
     function handleResize() {
       // const ratio = ratioScale * (window.innerHeight / standardHeight)
-      // const ratio = ratioScale * (window.innerWidth / window.innerHeight)
+      const ratio = ratioScale * (window.innerWidth / window.innerHeight)
 
-      const baseRatio = ratioScale * (window.innerWidth / window.innerHeight)
-      const dpr = typeof window !== 'undefined' ? window.devicePixelRatio : 1
-      const ratio = baseRatio / dpr;
+      // const baseRatio = ratioScale * (window.innerWidth / window.innerHeight)
+      // const dpr = typeof window !== 'undefined' ? window.devicePixelRatio : 1
+      // const ratio = baseRatio / dpr;
       setRatio(ratio)
     }
 
