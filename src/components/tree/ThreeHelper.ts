@@ -25,7 +25,7 @@ export const useThreeHelper = () => {
       // const ratio = ratioScale * (window.innerHeight / standardHeight)
       // const ratio = ratioScale * (window.innerWidth / window.innerHeight)
 
-      const baseRatio = ratioScale * (window.innerWidth / window.innerHeight)
+      const baseRatio = ratioScale * (window.innerHeight / standardHeight)
       const dpr = typeof window !== 'undefined' ? window.devicePixelRatio : 1
       const ratio = baseRatio / dpr;
       setRatio(ratio)
