@@ -68,7 +68,7 @@ const TreeInstances = forwardRef((props, ref) => {
       if (existingDummy && existingDummy.complete && (type === "leaf" || type === "flower")) {
         const typeConfig = typeConfigs[type];
         const dist = existingDummy.object.position.distanceTo(obj.position);
-        console.log('dist: ', dist)
+        // console.log('dist: ', dist)
         if (dist < typeConfig.distanceThreshold) {
           animateAndShrink(existingDummy, typeConfig.duration, typeConfig.calculateY);
           break;
